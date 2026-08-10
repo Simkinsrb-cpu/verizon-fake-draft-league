@@ -15,6 +15,7 @@
     --gold:#F2B134;
     --gold-dark:#C98A16;
     --teal:#2DD4BF;
+    --blue:#38BDF8;
     --red:#FB7185;
     --text:#EDF1F9;
     --muted:#8A94AC;
@@ -33,12 +34,64 @@
     font-family:'Inter',sans-serif;
     padding:28px 20px 60px;
     min-height:100vh;
+    overflow-x:hidden;
   }
-  .wrap{max-width:1180px;margin:0 auto;position:relative;padding-top:46px;}
+  .wrap{max-width:1180px;margin:0 auto;position:relative;padding-top:6px;}
 
+  .ticker-toggle-row{
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:6px;
+  }
+  .ticker-wrap{
+    overflow:hidden;
+    white-space:nowrap;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:9px 0;
+    margin-bottom:14px;
+    width:150%;
+    margin-left:-25%;
+  }
+  @media (max-width:820px){
+    .ticker-wrap{width:100%; margin-left:0;}
+  }
+  .ticker-track{
+    display:inline-block;
+    animation:ticker-scroll 26s linear infinite;
+    will-change:transform;
+  }
+  .ticker-wrap:hover .ticker-track{animation-play-state:paused;}
+  @keyframes ticker-scroll{
+    from{transform:translateX(0);}
+    to{transform:translateX(-50%);}
+  }
+  .ticker-item{
+    display:inline-flex;
+    align-items:baseline;
+    gap:6px;
+    font-family:'Oswald',sans-serif;
+    font-size:13px;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin:0 34px;
+  }
+  .ticker-item .tpos{color:var(--teal); font-weight:700;}
+  .ticker-item .tname{color:var(--text); font-weight:600; text-transform:none;}
+  .ticker-item .trank{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px; font-weight:700; color:#E619E6; text-transform:none;
+    text-shadow:0 0 8px rgba(230,25,230,.6);
+  }
+
+  .reset-btn-row{
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:6px;
+  }
   .reset-btn{
-    position:absolute;
-    top:0; right:0;
     background:rgba(251,113,133,.08);
     border:1.5px solid var(--red);
     color:var(--red);
@@ -51,7 +104,6 @@
     border-radius:999px;
     cursor:pointer;
     transition:background .15s, transform .12s;
-    z-index:30;
   }
   .reset-btn:hover{background:rgba(251,113,133,.18); transform:translateY(-1px);}
   .reset-btn:active{transform:translateY(0);}
@@ -66,14 +118,35 @@
     z-index:100;
   }
   .modal-overlay.open{display:flex;}
+
+  .lock-overlay{
+    position:fixed; inset:0;
+    background:
+      radial-gradient(circle at 15% -10%, rgba(242,177,52,0.12), transparent 45%),
+      radial-gradient(circle at 100% 0%, rgba(45,212,191,0.10), transparent 40%),
+      var(--bg);
+    display:flex; align-items:center; justify-content:center;
+    z-index:200;
+  }
+  .lock-overlay.unlocked{display:none;}
+  .lock-card{max-width:320px; text-align:center;}
+  #lockOverlay h3{color:var(--gold); font-size:22px;}
+  #lockOverlay p{text-align:center;}
   .modal-card{
-    background:linear-gradient(180deg,var(--panel-2),var(--panel));
-    border:1px solid var(--border);
+    background:linear-gradient(160deg,#233250,#1a2740 55%,#152034);
+    border:1px solid rgba(45,212,191,.4);
     border-radius:var(--radius-lg);
     padding:26px;
     width:100%;
     max-width:340px;
-    box-shadow:0 30px 60px -14px rgba(0,0,0,.6);
+    box-shadow:0 30px 60px -14px rgba(0,0,0,.6), 0 0 46px -12px rgba(45,212,191,.45);
+    position:relative;
+    overflow:hidden;
+  }
+  .modal-card::before{
+    content:'';
+    position:absolute; top:0; left:0; right:0; height:3px;
+    background:linear-gradient(90deg,var(--teal),var(--gold));
   }
   .modal-card h3{
     font-family:'Oswald',sans-serif;
@@ -131,6 +204,11 @@
     margin-bottom:12px;
   }
   .roster-modal-head h3{margin:0; color:var(--gold);}
+  .roster-modal-title-group{display:flex; align-items:baseline; gap:10px;}
+  .roster-modal-cap{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px; font-weight:700;
+  }
   .roster-close{
     background:transparent; border:none; color:var(--muted);
     font-size:22px; line-height:1; cursor:pointer; padding:0 4px;
@@ -138,8 +216,12 @@
   .roster-close:hover{color:var(--text);}
   .roster-modal .log-list{max-height:340px; margin-top:0;}
 
-  .cap-card{cursor:pointer; transition:border-color .15s, transform .12s;}
-  .cap-card:hover{border-color:var(--gold); transform:translateY(-2px);}
+  .cap-card{cursor:pointer; transition:border-color .18s, transform .18s, box-shadow .18s;}
+  .cap-card:hover{
+    border-color:rgba(242,177,52,.45);
+    transform:translateY(-3px);
+    box-shadow:0 12px 28px -8px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.06);
+  }
 
   /* ---------- Header ---------- */
   header{
@@ -191,7 +273,18 @@
     font-size:clamp(22px,3vw,38px); font-weight:700; color:var(--gold);
     line-height:1.1;
     text-transform:uppercase;
-    max-width:420px;
+    max-width:440px;
+  }
+  .team-badge-text .owner-name{
+    font-family:'Inter',sans-serif;
+    font-size:14px; font-weight:600; color:var(--text);
+    margin-top:6px;
+  }
+  .team-badge-text .owner-title{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--teal);
+    margin-top:2px;
   }
   .team-badge img{
     width:110px; height:110px;
@@ -230,6 +323,62 @@
   .card .sub{
     font-size:12.5px; color:var(--muted); margin:0 0 18px;
   }
+  .card-header-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .card-header-row h2{margin-bottom:0;}
+  .cap-total-badge{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; font-weight:700; letter-spacing:.04em;
+    color:var(--teal);
+    background:rgba(45,212,191,.12);
+    border:1px solid rgba(45,212,191,.35);
+    padding:4px 10px;
+    border-radius:999px;
+  }
+  .only-available-toggle{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--muted);
+    cursor:pointer;
+    white-space:nowrap;
+    user-select:none;
+  }
+  .only-available-toggle input{
+    width:14px; height:14px;
+    accent-color:var(--teal);
+    cursor:pointer;
+  }
+  .only-available-toggle:has(input:checked){color:var(--teal);}
+
+  .header-controls{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:8px;
+  }
+  .clear-form-btn{
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    padding:3px 10px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:border-color .15s, color .15s;
+  }
+  .clear-form-btn:hover{border-color:var(--red); color:var(--red);}
 
   /* ---------- Form ---------- */
   .field-row{
@@ -239,6 +388,7 @@
     margin-bottom:12px;
   }
   .field-row.triple{grid-template-columns:1fr 1fr 1fr;}
+  .field-row.quad{grid-template-columns:1.3fr .8fr .8fr .8fr; gap:8px;}
   .field{display:flex; flex-direction:column; gap:6px;}
   .field label{
     font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
@@ -281,14 +431,14 @@
     position:absolute;
     top:calc(100% + 4px);
     left:0; right:0;
-    background:#0E1526;
-    border:1.5px solid var(--border);
+    background:#101A30;
+    border:1.5px solid rgba(56,189,248,.4);
     border-radius:var(--radius-md);
     max-height:230px;
     overflow-y:auto;
     z-index:20;
     display:none;
-    box-shadow:0 14px 30px -10px rgba(0,0,0,.55);
+    box-shadow:0 14px 30px -10px rgba(0,0,0,.55), 0 0 24px -10px rgba(56,189,248,.35);
   }
   .suggest-box.open{display:block;}
   .suggest-item{
@@ -299,15 +449,21 @@
     border-bottom:1px solid var(--border);
   }
   .suggest-item:last-child{border-bottom:none;}
-  .suggest-item:hover, .suggest-item.active{background:var(--panel-2);}
-  .suggest-item .sname{flex:1; font-weight:600;}
+  .suggest-item:hover, .suggest-item.active{background:rgba(242,177,52,.14);}
+  .suggest-item .sname{flex:1; font-weight:700; color:var(--text);}
   .suggest-item .stag{
-    font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted);
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; font-weight:700;
+    color:var(--blue);
+    text-shadow:0 0 8px rgba(56,189,248,.55);
+  }
+  .suggest-item .stag.stag-conflict{
+    color:#FF3B4E;
+    text-shadow:0 0 8px rgba(255,59,78,.65);
   }
   .suggest-empty{padding:12px; font-size:12.5px; color:var(--muted); text-align:center;}
   .suggest-item.drafted{opacity:.5;}
   .suggest-item.drafted .sname{text-decoration:line-through;}
-  .suggest-item.drafted .stag{color:var(--red);}
+  .suggest-item.drafted .stag{color:var(--text);}
   .field input.drafted-field{
     color:var(--red) !important;
     opacity:.65;
@@ -360,20 +516,22 @@
 
   .del-pick-btn{
     flex:0 0 auto;
-    padding:4px 9px;
-    border:1px solid var(--border);
-    border-radius:999px;
-    background:transparent;
-    color:var(--red);
+    width:18px; height:18px;
+    padding:0;
+    display:flex; align-items:center; justify-content:center;
+    border:1px solid #FF2E9A;
+    border-radius:50%;
+    background:rgba(255,46,154,.10);
+    color:#FF2E9A;
     font-family:'Oswald',sans-serif;
-    font-weight:600;
+    font-weight:700;
     font-size:10px;
-    letter-spacing:.04em;
-    text-transform:uppercase;
+    line-height:1;
     cursor:pointer;
-    transition:background .12s ease, border-color .12s ease;
+    text-shadow:0 0 6px rgba(255,46,154,.6);
+    transition:background .12s ease, box-shadow .12s ease;
   }
-  .del-pick-btn:hover{background:rgba(251,113,133,.14); border-color:var(--red);}
+  .del-pick-btn:hover{background:rgba(255,46,154,.22); box-shadow:0 0 12px -2px rgba(255,46,154,.8);}
 
   .pick-row-header{
     display:flex; align-items:center; gap:10px;
@@ -388,7 +546,7 @@
   .pick-row-header .col-player{flex:1;}
   .pick-row-header .col-bye{min-width:52px;}
   .pick-row-header .col-sal{min-width:44px; text-align:right;}
-  .pick-row-header .col-del{min-width:54px;}
+  .pick-row-header .col-del{min-width:18px;}
 
   .msg{
     min-height:18px;
@@ -416,9 +574,28 @@
     flex-direction:column;
     gap:8px;
     padding-right:4px;
+    transition:max-height .25s ease;
   }
+  .log-list.expanded{max-height:none;}
   .log-list::-webkit-scrollbar{width:6px;}
   .log-list::-webkit-scrollbar-thumb{background:var(--border); border-radius:10px;}
+  .expand-toggle{
+    display:block;
+    width:100%;
+    margin-top:8px;
+    padding:7px;
+    background:transparent;
+    border:1px dashed var(--border);
+    border-radius:var(--radius-sm);
+    color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:border-color .15s, color .15s;
+  }
+  .expand-toggle:hover{border-color:var(--gold); color:var(--gold);}
   .pick-row{
     display:flex; align-items:center; gap:10px;
     background:#0E1526;
@@ -437,9 +614,16 @@
   .pick-row .pname{flex:1; font-weight:600;}
   .pick-row .pbye{
     font-family:'JetBrains Mono',monospace;
-    font-size:11px; color:var(--muted);
-    background:var(--panel-2); padding:3px 8px; border-radius:7px;
-    border:1px solid var(--border);
+    font-size:11px; font-weight:700; color:var(--blue);
+    background:rgba(56,189,248,.12); padding:3px 8px; border-radius:7px;
+    border:1.5px solid var(--blue);
+    box-shadow:0 0 8px -2px rgba(56,189,248,.55);
+  }
+  .pick-row .pbye.conflict{
+    color:var(--red);
+    background:rgba(251,113,133,.14);
+    border-color:var(--red);
+    box-shadow:0 0 8px -2px rgba(251,113,133,.6);
   }
   .pick-row .pamt{
     font-family:'JetBrains Mono',monospace;
@@ -451,41 +635,65 @@
   .cap-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:12px;
+    gap:16px;
   }
   .cap-card{
-    background:#0E1526;
-    border:1px solid var(--border);
+    background:linear-gradient(165deg,#141F38,#0B1220 70%);
+    border:1px solid rgba(255,255,255,.08);
     border-radius:var(--radius-md);
-    padding:14px;
+    padding:20px;
     position:relative;
     overflow:hidden;
+    box-shadow:0 4px 18px -6px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .cap-card::before{
+    content:'';
+    position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, var(--teal), var(--gold));
+    opacity:.55;
+  }
+  .card-top-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding-bottom:12px;
+    border-bottom:1px solid rgba(255,255,255,.07);
   }
   .cap-card .code{
     font-family:'Oswald',sans-serif;
-    font-size:16px; font-weight:600; letter-spacing:.03em;
+    font-size:21px; font-weight:600; letter-spacing:.04em;
   }
   .cap-card .slots{
-    font-size:10.5px; color:var(--muted); margin-top:1px;
+    display:flex; align-items:center; gap:8px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:26px; font-weight:700; color:var(--gold);
+    cursor:default;
   }
+  .cap-card .slots svg{flex:0 0 auto; width:27px; height:27px;}
   .gauge-row{
-    display:flex; align-items:center; gap:12px; margin-top:10px;
+    display:flex; align-items:center; gap:20px; margin-top:16px;
   }
   .gauge{
-    width:46px; height:46px; border-radius:50%;
+    width:104px; height:104px; border-radius:50%;
     display:flex; align-items:center; justify-content:center;
     flex-shrink:0;
+    box-shadow:0 0 0 1px rgba(255,255,255,.05);
   }
   .gauge-inner{
-    width:34px; height:34px; border-radius:50%;
-    background:#0E1526;
+    width:86px; height:86px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #16223C, #0B1220 75%);
     display:flex; align-items:center; justify-content:center;
     font-family:'JetBrains Mono',monospace;
-    font-size:9.5px; font-weight:700;
+    font-size:19px; font-weight:700;
+    box-shadow:inset 0 2px 6px rgba(0,0,0,.55), inset 0 -1px 0 rgba(255,255,255,.04);
+  }
+  .cap-figures{display:flex; flex-direction:column; gap:2px;}
+  .cap-figures .cap-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--muted);
   }
   .cap-figures .left{
     font-family:'JetBrains Mono',monospace;
-    font-size:17px; font-weight:700; line-height:1.1;
+    font-size:25px; font-weight:700; line-height:1.1;
   }
   .cap-figures .of{
     font-size:10px; color:var(--muted); margin-top:2px;
@@ -497,11 +705,37 @@
     font-size:11.5px;
     color:var(--muted);
   }
+  .sync-status{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+    margin-bottom:6px;
+  }
 </style>
 </head>
 <body>
+<div id="lockOverlay" class="lock-overlay">
+  <div class="modal-card lock-card">
+    <h3>Verizon Fake Draft League</h3>
+    <p>Enter the 4-digit PIN to access the draft dashboard.</p>
+    <input id="lockPinInput" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off">
+    <div id="lockError" class="modal-error"></div>
+    <button id="lockSubmitBtn" class="modal-btn confirm" style="width:100%;margin-top:12px;">Enter</button>
+  </div>
+</div>
 <div class="wrap">
-  <button id="resetBtn" class="reset-btn" title="Reset the draft">&#8635; Reset</button>
+  <div class="ticker-toggle-row">
+    <label class="only-available-toggle" title="Show top 3-4 available players per position instead of just #1">
+      <input type="checkbox" id="posBannerToggle">
+      POS
+    </label>
+  </div>
+  <div class="ticker-wrap">
+    <div class="ticker-track" id="tickerTrack"></div>
+  </div>
+
+  <div class="reset-btn-row">
+    <button id="resetBtn" class="reset-btn" title="Reset the draft">&#8635; Reset</button>
+  </div>
 
   <header>
     <div class="team-badge">
@@ -520,14 +754,26 @@
 
     <!-- LEFT: cap tracker -->
     <div class="card">
-      <h2>Cap Tracker</h2>
+      <div class="card-header-row">
+        <h2>Cap Tracker</h2>
+        <span class="cap-total-badge">$200 / team</span>
+      </div>
       <p class="sub">Live per-team budget, updates the instant a pick is logged.</p>
       <div class="cap-grid" id="capGrid"></div>
     </div>
 
     <!-- RIGHT: entry form + BY's picks -->
     <div class="card">
-      <h2>Nominate a Pick</h2>
+      <div class="card-header-row">
+        <h2>Nominate a Pick</h2>
+        <div class="header-controls">
+          <label class="only-available-toggle">
+            <input type="checkbox" id="onlyAvailableToggle">
+            Only Available
+          </label>
+          <button id="clearFormBtn" class="clear-form-btn">Clear</button>
+        </div>
+      </div>
       <p class="sub">Select a player, choose the winning team, log the price.</p>
 
       <div class="field" style="position:relative;">
@@ -536,7 +782,7 @@
         <div id="suggestBox" class="suggest-box"></div>
       </div>
 
-      <div class="field-row triple" style="margin-top:12px;">
+      <div class="field-row quad" style="margin-top:12px;">
         <div class="field">
           <label>NFL Team</label>
           <input id="nflTeam" readonly placeholder="—">
@@ -545,9 +791,14 @@
           <label>Bye</label>
           <input id="byeWeek" readonly placeholder="—">
         </div>
-        <div class="field">
+        <div class="field" style="position:relative;">
           <label>Pos</label>
-          <input id="posField" readonly placeholder="—">
+          <input id="posField" placeholder="Any" autocomplete="off">
+          <div id="posSuggestBox" class="suggest-box"></div>
+        </div>
+        <div class="field">
+          <label>Rank</label>
+          <input id="rankField" readonly placeholder="—">
         </div>
       </div>
 
@@ -580,11 +831,15 @@
         <span class="col-del"></span>
       </div>
       <div class="log-list" id="logList"></div>
+      <button id="expandByListBtn" class="expand-toggle">Show All &#9662;</button>
     </div>
 
   </div>
 
-  <footer>Picks are saved to this browser automatically — closing the tab or restarting your PC won't lose them, as long as you reopen this same file in the same browser. Use Reset to start over on purpose.</footer>
+  <footer>
+    <div id="syncStatus" class="sync-status">Connecting…</div>
+    Picks sync live across every device open on this dashboard. Use Reset to start over on purpose.
+  </footer>
 </div>
 
 <div id="resetOverlay" class="modal-overlay">
@@ -603,7 +858,10 @@
 <div id="teamRosterOverlay" class="modal-overlay">
   <div class="modal-card roster-modal">
     <div class="roster-modal-head">
-      <h3 id="rosterModalTitle">TEAM</h3>
+      <div class="roster-modal-title-group">
+        <h3 id="rosterModalTitle">TEAM</h3>
+        <span id="rosterModalCap" class="roster-modal-cap"></span>
+      </div>
       <button id="rosterCloseBtn" class="roster-close" title="Close">&times;</button>
     </div>
     <div class="pick-row-header">
@@ -617,32 +875,127 @@
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
-const PLAYERS = [{"name": "Jacoby Brissett", "team": "Arizona Cardinals", "bye": 14, "pos": "QB"}, {"name": "Carson Beck", "team": "Arizona Cardinals", "bye": 14, "pos": "QB"}, {"name": "Gardner Minshew", "team": "Arizona Cardinals", "bye": 14, "pos": "QB"}, {"name": "Jeremiyah Love", "team": "Arizona Cardinals", "bye": 14, "pos": "RB"}, {"name": "Tyler Allgeier", "team": "Arizona Cardinals", "bye": 14, "pos": "RB"}, {"name": "Bam Knight", "team": "Arizona Cardinals", "bye": 14, "pos": "RB"}, {"name": "Marvin Harrison Jr.", "team": "Arizona Cardinals", "bye": 14, "pos": "WR"}, {"name": "Michael Wilson", "team": "Arizona Cardinals", "bye": 14, "pos": "WR"}, {"name": "Kendrick Bourne", "team": "Arizona Cardinals", "bye": 14, "pos": "WR"}, {"name": "Reggie Virgil", "team": "Arizona Cardinals", "bye": 14, "pos": "WR"}, {"name": "Devin Duvernay", "team": "Arizona Cardinals", "bye": 14, "pos": "WR"}, {"name": "Jalen Brooks", "team": "Arizona Cardinals", "bye": 14, "pos": "WR"}, {"name": "Trey McBride", "team": "Arizona Cardinals", "bye": 14, "pos": "TE"}, {"name": "Elijah Higgins", "team": "Arizona Cardinals", "bye": 14, "pos": "TE"}, {"name": "Tip Reiman", "team": "Arizona Cardinals", "bye": 14, "pos": "TE"}, {"name": "Tua Tagovailoa", "team": "Atlanta Falcons", "bye": 11, "pos": "QB"}, {"name": "Michael Penix Jr.", "team": "Atlanta Falcons", "bye": 11, "pos": "QB"}, {"name": "Bijan Robinson", "team": "Atlanta Falcons", "bye": 11, "pos": "RB"}, {"name": "Brian Robinson Jr.", "team": "Atlanta Falcons", "bye": 11, "pos": "RB"}, {"name": "Drake London", "team": "Atlanta Falcons", "bye": 11, "pos": "WR"}, {"name": "Zachariah Branch", "team": "Atlanta Falcons", "bye": 11, "pos": "WR"}, {"name": "Jahan Dotson", "team": "Atlanta Falcons", "bye": 11, "pos": "WR"}, {"name": "Olamide Zaccheaus", "team": "Atlanta Falcons", "bye": 11, "pos": "WR"}, {"name": "Kyle Pitts", "team": "Atlanta Falcons", "bye": 11, "pos": "TE"}, {"name": "Austin Hooper", "team": "Atlanta Falcons", "bye": 11, "pos": "TE"}, {"name": "Charlie Woerner", "team": "Atlanta Falcons", "bye": 11, "pos": "TE"}, {"name": "Lamar Jackson", "team": "Baltimore Ravens", "bye": 13, "pos": "QB"}, {"name": "Tyler Huntley", "team": "Baltimore Ravens", "bye": 13, "pos": "QB"}, {"name": "Derrick Henry", "team": "Baltimore Ravens", "bye": 13, "pos": "RB"}, {"name": "Justice Hill", "team": "Baltimore Ravens", "bye": 13, "pos": "RB"}, {"name": "Adam Randall", "team": "Baltimore Ravens", "bye": 13, "pos": "RB"}, {"name": "Rasheen Ali", "team": "Baltimore Ravens", "bye": 13, "pos": "RB"}, {"name": "Zay Flowers", "team": "Baltimore Ravens", "bye": 13, "pos": "WR"}, {"name": "Rashod Bateman", "team": "Baltimore Ravens", "bye": 13, "pos": "WR"}, {"name": "Ja'Kobi Lane", "team": "Baltimore Ravens", "bye": 13, "pos": "WR"}, {"name": "Elijah Sarratt", "team": "Baltimore Ravens", "bye": 13, "pos": "WR"}, {"name": "Devontez Walker", "team": "Baltimore Ravens", "bye": 13, "pos": "WR"}, {"name": "LaJohntay Wester", "team": "Baltimore Ravens", "bye": 13, "pos": "WR"}, {"name": "Mark Andrews", "team": "Baltimore Ravens", "bye": 13, "pos": "TE"}, {"name": "Durham Smythe", "team": "Baltimore Ravens", "bye": 13, "pos": "TE"}, {"name": "Josh Cuevas", "team": "Baltimore Ravens", "bye": 13, "pos": "TE"}, {"name": "Matthew Hibner", "team": "Baltimore Ravens", "bye": 13, "pos": "TE"}, {"name": "Josh Allen", "team": "Buffalo Bills", "bye": 7, "pos": "QB"}, {"name": "Kyle Allen", "team": "Buffalo Bills", "bye": 7, "pos": "QB"}, {"name": "James Cook", "team": "Buffalo Bills", "bye": 7, "pos": "RB"}, {"name": "Ty Johnson", "team": "Buffalo Bills", "bye": 7, "pos": "RB"}, {"name": "Ray Davis", "team": "Buffalo Bills", "bye": 7, "pos": "RB"}, {"name": "DJ Moore", "team": "Buffalo Bills", "bye": 7, "pos": "WR"}, {"name": "Khalil Shakir", "team": "Buffalo Bills", "bye": 7, "pos": "WR"}, {"name": "Keon Coleman", "team": "Buffalo Bills", "bye": 7, "pos": "WR"}, {"name": "Josh Palmer", "team": "Buffalo Bills", "bye": 7, "pos": "WR"}, {"name": "Skyler Bell", "team": "Buffalo Bills", "bye": 7, "pos": "WR"}, {"name": "Tyrell Shavers", "team": "Buffalo Bills", "bye": 7, "pos": "WR"}, {"name": "Dalton Kincaid", "team": "Buffalo Bills", "bye": 7, "pos": "TE"}, {"name": "Dawson Knox", "team": "Buffalo Bills", "bye": 7, "pos": "TE"}, {"name": "Jackson Hawes", "team": "Buffalo Bills", "bye": 7, "pos": "TE"}, {"name": "Bryce Young", "team": "Carolina Panthers", "bye": 5, "pos": "QB"}, {"name": "Kenny Pickett", "team": "Carolina Panthers", "bye": 5, "pos": "QB"}, {"name": "Chuba Hubbard", "team": "Carolina Panthers", "bye": 5, "pos": "RB"}, {"name": "Jonathon Brooks", "team": "Carolina Panthers", "bye": 5, "pos": "RB"}, {"name": "Trevor Etienne", "team": "Carolina Panthers", "bye": 5, "pos": "RB"}, {"name": "Tetairoa McMillan", "team": "Carolina Panthers", "bye": 5, "pos": "WR"}, {"name": "Jalen Coker", "team": "Carolina Panthers", "bye": 5, "pos": "WR"}, {"name": "Xavier Legette", "team": "Carolina Panthers", "bye": 5, "pos": "WR"}, {"name": "Jimmy Horn Jr.", "team": "Carolina Panthers", "bye": 5, "pos": "WR"}, {"name": "Brycen Tremayne", "team": "Carolina Panthers", "bye": 5, "pos": "WR"}, {"name": "Ja'Tavion Sanders", "team": "Carolina Panthers", "bye": 5, "pos": "TE"}, {"name": "Tommy Tremble", "team": "Carolina Panthers", "bye": 5, "pos": "TE"}, {"name": "Mitchell Evans", "team": "Carolina Panthers", "bye": 5, "pos": "TE"}, {"name": "Caleb Williams", "team": "Chicago Bears", "bye": 10, "pos": "QB"}, {"name": "Tyson Bagent", "team": "Chicago Bears", "bye": 10, "pos": "QB"}, {"name": "D'Andre Swift", "team": "Chicago Bears", "bye": 10, "pos": "RB"}, {"name": "Kyle Monangai", "team": "Chicago Bears", "bye": 10, "pos": "RB"}, {"name": "Rome Odunze", "team": "Chicago Bears", "bye": 10, "pos": "WR"}, {"name": "Luther Burden III", "team": "Chicago Bears", "bye": 10, "pos": "WR"}, {"name": "Kalif Raymond", "team": "Chicago Bears", "bye": 10, "pos": "WR"}, {"name": "Zavion Thomas", "team": "Chicago Bears", "bye": 10, "pos": "WR"}, {"name": "Jahdae Walker", "team": "Chicago Bears", "bye": 10, "pos": "WR"}, {"name": "Colston Loveland", "team": "Chicago Bears", "bye": 10, "pos": "TE"}, {"name": "Cole Kmet", "team": "Chicago Bears", "bye": 10, "pos": "TE"}, {"name": "Sam Roush", "team": "Chicago Bears", "bye": 10, "pos": "TE"}, {"name": "Joe Burrow", "team": "Cincinnati Bengals", "bye": 6, "pos": "QB"}, {"name": "Joe Flacco", "team": "Cincinnati Bengals", "bye": 6, "pos": "QB"}, {"name": "Chase Brown", "team": "Cincinnati Bengals", "bye": 6, "pos": "RB"}, {"name": "Samaje Perine", "team": "Cincinnati Bengals", "bye": 6, "pos": "RB"}, {"name": "Tahj Brooks", "team": "Cincinnati Bengals", "bye": 6, "pos": "RB"}, {"name": "Ja'Marr Chase", "team": "Cincinnati Bengals", "bye": 6, "pos": "WR"}, {"name": "Tee Higgins", "team": "Cincinnati Bengals", "bye": 6, "pos": "WR"}, {"name": "Andrei Iosivas", "team": "Cincinnati Bengals", "bye": 6, "pos": "WR"}, {"name": "Mitchell Tinsley", "team": "Cincinnati Bengals", "bye": 6, "pos": "WR"}, {"name": "Colbie Young", "team": "Cincinnati Bengals", "bye": 6, "pos": "WR"}, {"name": "Charlie Jones", "team": "Cincinnati Bengals", "bye": 6, "pos": "WR"}, {"name": "Ke'Shawn Williams", "team": "Cincinnati Bengals", "bye": 6, "pos": "WR"}, {"name": "Mike Gesicki", "team": "Cincinnati Bengals", "bye": 6, "pos": "TE"}, {"name": "Erick All", "team": "Cincinnati Bengals", "bye": 6, "pos": "TE"}, {"name": "Drew Sample", "team": "Cincinnati Bengals", "bye": 6, "pos": "TE"}, {"name": "Tanner Hudson", "team": "Cincinnati Bengals", "bye": 6, "pos": "TE"}, {"name": "Deshaun Watson", "team": "Cleveland Browns", "bye": 11, "pos": "QB"}, {"name": "Shedeur Sanders", "team": "Cleveland Browns", "bye": 11, "pos": "QB"}, {"name": "Quinshon Judkins", "team": "Cleveland Browns", "bye": 11, "pos": "RB"}, {"name": "Dylan Sampson", "team": "Cleveland Browns", "bye": 11, "pos": "RB"}, {"name": "Michael Burton", "team": "Cleveland Browns", "bye": 11, "pos": "RB"}, {"name": "KC Concepcion", "team": "Cleveland Browns", "bye": 11, "pos": "WR"}, {"name": "Jerry Jeudy", "team": "Cleveland Browns", "bye": 11, "pos": "WR"}, {"name": "Denzel Boston", "team": "Cleveland Browns", "bye": 11, "pos": "WR"}, {"name": "Isaiah Bond", "team": "Cleveland Browns", "bye": 11, "pos": "WR"}, {"name": "Malachi Corley", "team": "Cleveland Browns", "bye": 11, "pos": "WR"}, {"name": "Cedric Tillman", "team": "Cleveland Browns", "bye": 11, "pos": "WR"}, {"name": "Gage Larvadain", "team": "Cleveland Browns", "bye": 11, "pos": "WR"}, {"name": "Harold Fannin Jr.", "team": "Cleveland Browns", "bye": 11, "pos": "TE"}, {"name": "Joe Royer", "team": "Cleveland Browns", "bye": 11, "pos": "TE"}, {"name": "Jack Stoll", "team": "Cleveland Browns", "bye": 11, "pos": "TE"}, {"name": "Dak Prescott", "team": "Dallas Cowboys", "bye": 14, "pos": "QB"}, {"name": "Sam Howell", "team": "Dallas Cowboys", "bye": 14, "pos": "QB"}, {"name": "Javonte Williams", "team": "Dallas Cowboys", "bye": 14, "pos": "RB"}, {"name": "Jaydon Blue", "team": "Dallas Cowboys", "bye": 14, "pos": "RB"}, {"name": "Malik Davis", "team": "Dallas Cowboys", "bye": 14, "pos": "RB"}, {"name": "Hunter Luepke", "team": "Dallas Cowboys", "bye": 14, "pos": "RB"}, {"name": "CeeDee Lamb", "team": "Dallas Cowboys", "bye": 14, "pos": "WR"}, {"name": "George Pickens", "team": "Dallas Cowboys", "bye": 14, "pos": "WR"}, {"name": "Ryan Flournoy", "team": "Dallas Cowboys", "bye": 14, "pos": "WR"}, {"name": "Kavontae Turpin", "team": "Dallas Cowboys", "bye": 14, "pos": "WR"}, {"name": "Jonathan Mingo", "team": "Dallas Cowboys", "bye": 14, "pos": "WR"}, {"name": "Jake Ferguson", "team": "Dallas Cowboys", "bye": 14, "pos": "TE"}, {"name": "Luke Schoonmaker", "team": "Dallas Cowboys", "bye": 14, "pos": "TE"}, {"name": "Brevyn Spann-Ford", "team": "Dallas Cowboys", "bye": 14, "pos": "TE"}, {"name": "Bo Nix", "team": "Denver Broncos", "bye": 10, "pos": "QB"}, {"name": "Jarrett Stidham", "team": "Denver Broncos", "bye": 10, "pos": "QB"}, {"name": "J.K. Dobbins", "team": "Denver Broncos", "bye": 10, "pos": "RB"}, {"name": "RJ Harvey", "team": "Denver Broncos", "bye": 10, "pos": "RB"}, {"name": "Jonah Coleman", "team": "Denver Broncos", "bye": 10, "pos": "RB"}, {"name": "Tyler Badie", "team": "Denver Broncos", "bye": 10, "pos": "RB"}, {"name": "Adam Prentice", "team": "Denver Broncos", "bye": 10, "pos": "RB"}, {"name": "Jaylen Waddle", "team": "Denver Broncos", "bye": 10, "pos": "WR"}, {"name": "Courtland Sutton", "team": "Denver Broncos", "bye": 10, "pos": "WR"}, {"name": "Pat Bryant", "team": "Denver Broncos", "bye": 10, "pos": "WR"}, {"name": "Marvin Mims", "team": "Denver Broncos", "bye": 10, "pos": "WR"}, {"name": "Troy Franklin", "team": "Denver Broncos", "bye": 10, "pos": "WR"}, {"name": "Michael Bandy", "team": "Denver Broncos", "bye": 10, "pos": "WR"}, {"name": "Evan Engram", "team": "Denver Broncos", "bye": 10, "pos": "TE"}, {"name": "Adam Trautman", "team": "Denver Broncos", "bye": 10, "pos": "TE"}, {"name": "Nate Adkins", "team": "Denver Broncos", "bye": 10, "pos": "TE"}, {"name": "Justin Joly", "team": "Denver Broncos", "bye": 10, "pos": "TE"}, {"name": "Jared Goff", "team": "Detroit Lions", "bye": 6, "pos": "QB"}, {"name": "Teddy Bridgewater", "team": "Detroit Lions", "bye": 6, "pos": "QB"}, {"name": "Jahmyr Gibbs", "team": "Detroit Lions", "bye": 6, "pos": "RB"}, {"name": "Isiah Pacheco", "team": "Detroit Lions", "bye": 6, "pos": "RB"}, {"name": "Jacob Saylors", "team": "Detroit Lions", "bye": 6, "pos": "RB"}, {"name": "Amon-Ra St. Brown", "team": "Detroit Lions", "bye": 6, "pos": "WR"}, {"name": "Jameson Williams", "team": "Detroit Lions", "bye": 6, "pos": "WR"}, {"name": "Isaac TeSlaa", "team": "Detroit Lions", "bye": 6, "pos": "WR"}, {"name": "Greg Dortch", "team": "Detroit Lions", "bye": 6, "pos": "WR"}, {"name": "Sam LaPorta", "team": "Detroit Lions", "bye": 6, "pos": "TE"}, {"name": "Brock Wright", "team": "Detroit Lions", "bye": 6, "pos": "TE"}, {"name": "Tyler Conklin", "team": "Detroit Lions", "bye": 6, "pos": "TE"}, {"name": "Jordan Love", "team": "Green Bay Packers", "bye": 11, "pos": "QB"}, {"name": "Tyrod Taylor", "team": "Green Bay Packers", "bye": 11, "pos": "QB"}, {"name": "Josh Jacobs", "team": "Green Bay Packers", "bye": 11, "pos": "RB"}, {"name": "MarShawn Lloyd", "team": "Green Bay Packers", "bye": 11, "pos": "RB"}, {"name": "Chris Brooks", "team": "Green Bay Packers", "bye": 11, "pos": "RB"}, {"name": "Christian Watson", "team": "Green Bay Packers", "bye": 11, "pos": "WR"}, {"name": "Matthew Golden", "team": "Green Bay Packers", "bye": 11, "pos": "WR"}, {"name": "Jayden Reed", "team": "Green Bay Packers", "bye": 11, "pos": "WR"}, {"name": "Savion Williams", "team": "Green Bay Packers", "bye": 11, "pos": "WR"}, {"name": "Bo Melton", "team": "Green Bay Packers", "bye": 11, "pos": "WR"}, {"name": "Skyy Moore", "team": "Green Bay Packers", "bye": 11, "pos": "WR"}, {"name": "Tucker Kraft", "team": "Green Bay Packers", "bye": 11, "pos": "TE"}, {"name": "Luke Musgrave", "team": "Green Bay Packers", "bye": 11, "pos": "TE"}, {"name": "C.J. Stroud", "team": "Houston Texans", "bye": 8, "pos": "QB"}, {"name": "Davis Mills", "team": "Houston Texans", "bye": 8, "pos": "QB"}, {"name": "David Montgomery", "team": "Houston Texans", "bye": 8, "pos": "RB"}, {"name": "Woody Marks", "team": "Houston Texans", "bye": 8, "pos": "RB"}, {"name": "Jawhar Jordan", "team": "Houston Texans", "bye": 8, "pos": "RB"}, {"name": "British Brooks", "team": "Houston Texans", "bye": 8, "pos": "RB"}, {"name": "Nico Collins", "team": "Houston Texans", "bye": 8, "pos": "WR"}, {"name": "Jayden Higgins", "team": "Houston Texans", "bye": 8, "pos": "WR"}, {"name": "Tank Dell", "team": "Houston Texans", "bye": 8, "pos": "WR"}, {"name": "Jaylin Noel", "team": "Houston Texans", "bye": 8, "pos": "WR"}, {"name": "Xavier Hutchinson", "team": "Houston Texans", "bye": 8, "pos": "WR"}, {"name": "Justin Watson", "team": "Houston Texans", "bye": 8, "pos": "WR"}, {"name": "Dalton Schultz", "team": "Houston Texans", "bye": 8, "pos": "TE"}, {"name": "Cade Stover", "team": "Houston Texans", "bye": 8, "pos": "TE"}, {"name": "Foster Moreau", "team": "Houston Texans", "bye": 8, "pos": "TE"}, {"name": "Marlin Klein", "team": "Houston Texans", "bye": 8, "pos": "TE"}, {"name": "Daniel Jones", "team": "Indianapolis Colts", "bye": 13, "pos": "QB"}, {"name": "Riley Leonard", "team": "Indianapolis Colts", "bye": 13, "pos": "QB"}, {"name": "Jonathan Taylor", "team": "Indianapolis Colts", "bye": 13, "pos": "RB"}, {"name": "DJ Giddens", "team": "Indianapolis Colts", "bye": 13, "pos": "RB"}, {"name": "Seth McGowan", "team": "Indianapolis Colts", "bye": 13, "pos": "RB"}, {"name": "Alec Pierce", "team": "Indianapolis Colts", "bye": 13, "pos": "WR"}, {"name": "Josh Downs", "team": "Indianapolis Colts", "bye": 13, "pos": "WR"}, {"name": "Nick Westbrook-Ikhine", "team": "Indianapolis Colts", "bye": 13, "pos": "WR"}, {"name": "Ashton Dulin", "team": "Indianapolis Colts", "bye": 13, "pos": "WR"}, {"name": "Anthony Gould", "team": "Indianapolis Colts", "bye": 13, "pos": "WR"}, {"name": "Laquon Treadwell", "team": "Indianapolis Colts", "bye": 13, "pos": "WR"}, {"name": "Tyler Warren", "team": "Indianapolis Colts", "bye": 13, "pos": "TE"}, {"name": "Mo Alie-Cox", "team": "Indianapolis Colts", "bye": 13, "pos": "TE"}, {"name": "Andrew Ogletree", "team": "Indianapolis Colts", "bye": 13, "pos": "TE"}, {"name": "Trevor Lawrence", "team": "Jacksonville Jaguars", "bye": 7, "pos": "QB"}, {"name": "Nick Mullens", "team": "Jacksonville Jaguars", "bye": 7, "pos": "QB"}, {"name": "Bhayshul Tuten", "team": "Jacksonville Jaguars", "bye": 7, "pos": "RB"}, {"name": "Chris Rodriguez", "team": "Jacksonville Jaguars", "bye": 7, "pos": "RB"}, {"name": "LeQuint Allen", "team": "Jacksonville Jaguars", "bye": 7, "pos": "RB"}, {"name": "DeeJay Dallas", "team": "Jacksonville Jaguars", "bye": 7, "pos": "RB"}, {"name": "Parker Washington", "team": "Jacksonville Jaguars", "bye": 7, "pos": "WR"}, {"name": "Jakobi Meyers", "team": "Jacksonville Jaguars", "bye": 7, "pos": "WR"}, {"name": "Brian Thomas Jr.", "team": "Jacksonville Jaguars", "bye": 7, "pos": "WR"}, {"name": "Travis Hunter", "team": "Jacksonville Jaguars", "bye": 7, "pos": "WR"}, {"name": "Josh Cameron", "team": "Jacksonville Jaguars", "bye": 7, "pos": "WR"}, {"name": "Brenton Strange", "team": "Jacksonville Jaguars", "bye": 7, "pos": "TE"}, {"name": "Nate Boerkircher", "team": "Jacksonville Jaguars", "bye": 7, "pos": "TE"}, {"name": "Tanner Koziol", "team": "Jacksonville Jaguars", "bye": 7, "pos": "TE"}, {"name": "Patrick Mahomes", "team": "Kansas City Chiefs", "bye": 5, "pos": "QB"}, {"name": "Justin Fields", "team": "Kansas City Chiefs", "bye": 5, "pos": "QB"}, {"name": "Ken Walker III", "team": "Kansas City Chiefs", "bye": 5, "pos": "RB"}, {"name": "Emari Demercado", "team": "Kansas City Chiefs", "bye": 5, "pos": "RB"}, {"name": "Emmett Johnson", "team": "Kansas City Chiefs", "bye": 5, "pos": "RB"}, {"name": "Brashard Smith", "team": "Kansas City Chiefs", "bye": 5, "pos": "RB"}, {"name": "Rashee Rice", "team": "Kansas City Chiefs", "bye": 5, "pos": "WR"}, {"name": "Xavier Worthy", "team": "Kansas City Chiefs", "bye": 5, "pos": "WR"}, {"name": "Tyquan Thornton", "team": "Kansas City Chiefs", "bye": 5, "pos": "WR"}, {"name": "Cyrus Allen", "team": "Kansas City Chiefs", "bye": 5, "pos": "WR"}, {"name": "Jalen Royals", "team": "Kansas City Chiefs", "bye": 5, "pos": "WR"}, {"name": "Nikko Remigio", "team": "Kansas City Chiefs", "bye": 5, "pos": "WR"}, {"name": "Travis Kelce", "team": "Kansas City Chiefs", "bye": 5, "pos": "TE"}, {"name": "Noah Gray", "team": "Kansas City Chiefs", "bye": 5, "pos": "TE"}, {"name": "Justin Herbert", "team": "Los Angeles Chargers", "bye": 7, "pos": "QB"}, {"name": "Trey Lance", "team": "Los Angeles Chargers", "bye": 7, "pos": "QB"}, {"name": "Omarion Hampton", "team": "Los Angeles Chargers", "bye": 7, "pos": "RB"}, {"name": "Keaton Mitchell", "team": "Los Angeles Chargers", "bye": 7, "pos": "RB"}, {"name": "Kimani Vidal", "team": "Los Angeles Chargers", "bye": 7, "pos": "RB"}, {"name": "Alec Ingold", "team": "Los Angeles Chargers", "bye": 7, "pos": "RB"}, {"name": "Ladd McConkey", "team": "Los Angeles Chargers", "bye": 7, "pos": "WR"}, {"name": "Quentin Johnston", "team": "Los Angeles Chargers", "bye": 7, "pos": "WR"}, {"name": "Tre Harris", "team": "Los Angeles Chargers", "bye": 7, "pos": "WR"}, {"name": "Brenen Thompson", "team": "Los Angeles Chargers", "bye": 7, "pos": "WR"}, {"name": "KeAndre Lambert-Smith", "team": "Los Angeles Chargers", "bye": 7, "pos": "WR"}, {"name": "Derius Davis", "team": "Los Angeles Chargers", "bye": 7, "pos": "WR"}, {"name": "Oronde Gadsden II", "team": "Los Angeles Chargers", "bye": 7, "pos": "TE"}, {"name": "David Njoku", "team": "Los Angeles Chargers", "bye": 7, "pos": "TE"}, {"name": "Charlie Kolar", "team": "Los Angeles Chargers", "bye": 7, "pos": "TE"}, {"name": "Matthew Stafford", "team": "Los Angeles Rams", "bye": 11, "pos": "QB"}, {"name": "Ty Simpson", "team": "Los Angeles Rams", "bye": 11, "pos": "QB"}, {"name": "Kyren Williams", "team": "Los Angeles Rams", "bye": 11, "pos": "RB"}, {"name": "Blake Corum", "team": "Los Angeles Rams", "bye": 11, "pos": "RB"}, {"name": "Puka Nacua", "team": "Los Angeles Rams", "bye": 11, "pos": "WR"}, {"name": "Davante Adams", "team": "Los Angeles Rams", "bye": 11, "pos": "WR"}, {"name": "Jordan Whittington", "team": "Los Angeles Rams", "bye": 11, "pos": "WR"}, {"name": "Konata Mumpfield", "team": "Los Angeles Rams", "bye": 11, "pos": "WR"}, {"name": "Xavier Smith", "team": "Los Angeles Rams", "bye": 11, "pos": "WR"}, {"name": "CJ Daniels", "team": "Los Angeles Rams", "bye": 11, "pos": "WR"}, {"name": "Terrance Ferguson", "team": "Los Angeles Rams", "bye": 11, "pos": "TE"}, {"name": "Colby Parkinson", "team": "Los Angeles Rams", "bye": 11, "pos": "TE"}, {"name": "Tyler Higbee", "team": "Los Angeles Rams", "bye": 11, "pos": "TE"}, {"name": "Davis Allen", "team": "Los Angeles Rams", "bye": 11, "pos": "TE"}, {"name": "Max Klare", "team": "Los Angeles Rams", "bye": 11, "pos": "TE"}, {"name": "Fernando Mendoza", "team": "Las Vegas Raiders", "bye": 13, "pos": "QB"}, {"name": "Kirk Cousins", "team": "Las Vegas Raiders", "bye": 13, "pos": "QB"}, {"name": "Ashton Jeanty", "team": "Las Vegas Raiders", "bye": 13, "pos": "RB"}, {"name": "Mike Washington Jr.", "team": "Las Vegas Raiders", "bye": 13, "pos": "RB"}, {"name": "Connor Heyward", "team": "Las Vegas Raiders", "bye": 13, "pos": "RB"}, {"name": "Dylan Laube", "team": "Las Vegas Raiders", "bye": 13, "pos": "RB"}, {"name": "Tre Tucker", "team": "Las Vegas Raiders", "bye": 13, "pos": "WR"}, {"name": "Jalen Nailor", "team": "Las Vegas Raiders", "bye": 13, "pos": "WR"}, {"name": "Jack Bech", "team": "Las Vegas Raiders", "bye": 13, "pos": "WR"}, {"name": "Dont'e Thornton Jr.", "team": "Las Vegas Raiders", "bye": 13, "pos": "WR"}, {"name": "Malik Benson", "team": "Las Vegas Raiders", "bye": 13, "pos": "WR"}, {"name": "Dareke Young", "team": "Las Vegas Raiders", "bye": 13, "pos": "WR"}, {"name": "Brock Bowers", "team": "Las Vegas Raiders", "bye": 13, "pos": "TE"}, {"name": "Michael Mayer", "team": "Las Vegas Raiders", "bye": 13, "pos": "TE"}, {"name": "Ian Thomas", "team": "Las Vegas Raiders", "bye": 13, "pos": "TE"}, {"name": "Malik Willis", "team": "Miami Dolphins", "bye": 6, "pos": "QB"}, {"name": "Quinn Ewers", "team": "Miami Dolphins", "bye": 6, "pos": "QB"}, {"name": "De'Von Achane", "team": "Miami Dolphins", "bye": 6, "pos": "RB"}, {"name": "Jaylen Wright", "team": "Miami Dolphins", "bye": 6, "pos": "RB"}, {"name": "Ollie Gordon II", "team": "Miami Dolphins", "bye": 6, "pos": "RB"}, {"name": "Malik Washington", "team": "Miami Dolphins", "bye": 6, "pos": "WR"}, {"name": "Jalen Tolbert", "team": "Miami Dolphins", "bye": 6, "pos": "WR"}, {"name": "Chris Bell", "team": "Miami Dolphins", "bye": 6, "pos": "WR"}, {"name": "Caleb Douglas", "team": "Miami Dolphins", "bye": 6, "pos": "WR"}, {"name": "Tutu Atwell", "team": "Miami Dolphins", "bye": 6, "pos": "WR"}, {"name": "Kevin Coleman Jr.", "team": "Miami Dolphins", "bye": 6, "pos": "WR"}, {"name": "Greg Dulcich", "team": "Miami Dolphins", "bye": 6, "pos": "TE"}, {"name": "Will Kacmarek", "team": "Miami Dolphins", "bye": 6, "pos": "TE"}, {"name": "Ben Sims", "team": "Miami Dolphins", "bye": 6, "pos": "TE"}, {"name": "Kyler Murray", "team": "Minnesota Vikings", "bye": 6, "pos": "QB"}, {"name": "J.J. McCarthy", "team": "Minnesota Vikings", "bye": 6, "pos": "QB"}, {"name": "Aaron Jones", "team": "Minnesota Vikings", "bye": 6, "pos": "RB"}, {"name": "Jordan Mason", "team": "Minnesota Vikings", "bye": 6, "pos": "RB"}, {"name": "Demond Claiborne", "team": "Minnesota Vikings", "bye": 6, "pos": "RB"}, {"name": "Max Bredeson", "team": "Minnesota Vikings", "bye": 6, "pos": "RB"}, {"name": "Justin Jefferson", "team": "Minnesota Vikings", "bye": 6, "pos": "WR"}, {"name": "Jordan Addison", "team": "Minnesota Vikings", "bye": 6, "pos": "WR"}, {"name": "Jauan Jennings", "team": "Minnesota Vikings", "bye": 6, "pos": "WR"}, {"name": "Tai Felton", "team": "Minnesota Vikings", "bye": 6, "pos": "WR"}, {"name": "Myles Price", "team": "Minnesota Vikings", "bye": 6, "pos": "WR"}, {"name": "Jeshaun Jones", "team": "Minnesota Vikings", "bye": 6, "pos": "WR"}, {"name": "T.J. Hockenson", "team": "Minnesota Vikings", "bye": 6, "pos": "TE"}, {"name": "Josh Oliver", "team": "Minnesota Vikings", "bye": 6, "pos": "TE"}, {"name": "Drake Maye", "team": "New England Patriots", "bye": 11, "pos": "QB"}, {"name": "Tommy DeVito", "team": "New England Patriots", "bye": 11, "pos": "QB"}, {"name": "TreVeyon Henderson", "team": "New England Patriots", "bye": 11, "pos": "RB"}, {"name": "Rhamondre Stevenson", "team": "New England Patriots", "bye": 11, "pos": "RB"}, {"name": "Reggie Gilliam", "team": "New England Patriots", "bye": 11, "pos": "RB"}, {"name": "A.J. Brown", "team": "New England Patriots", "bye": 11, "pos": "WR"}, {"name": "Romeo Doubs", "team": "New England Patriots", "bye": 11, "pos": "WR"}, {"name": "Kayshon Boutte", "team": "New England Patriots", "bye": 11, "pos": "WR"}, {"name": "DeMario Douglas", "team": "New England Patriots", "bye": 11, "pos": "WR"}, {"name": "Mack Hollins", "team": "New England Patriots", "bye": 11, "pos": "WR"}, {"name": "Kyle T. Williams", "team": "New England Patriots", "bye": 11, "pos": "WR"}, {"name": "Efton Chism III", "team": "New England Patriots", "bye": 11, "pos": "WR"}, {"name": "Hunter Henry", "team": "New England Patriots", "bye": 11, "pos": "TE"}, {"name": "Eli Raridon", "team": "New England Patriots", "bye": 11, "pos": "TE"}, {"name": "CJ Dippre", "team": "New England Patriots", "bye": 11, "pos": "TE"}, {"name": "Tyler Shough", "team": "New Orleans Saints", "bye": 8, "pos": "QB"}, {"name": "Spencer Rattler", "team": "New Orleans Saints", "bye": 8, "pos": "QB"}, {"name": "Travis Etienne", "team": "New Orleans Saints", "bye": 8, "pos": "RB"}, {"name": "Alvin Kamara", "team": "New Orleans Saints", "bye": 8, "pos": "RB"}, {"name": "Kendre Miller", "team": "New Orleans Saints", "bye": 8, "pos": "RB"}, {"name": "Chris Olave", "team": "New Orleans Saints", "bye": 8, "pos": "WR"}, {"name": "Jordyn Tyson", "team": "New Orleans Saints", "bye": 8, "pos": "WR"}, {"name": "Devaughn Vele", "team": "New Orleans Saints", "bye": 8, "pos": "WR"}, {"name": "Bryce Lance", "team": "New Orleans Saints", "bye": 8, "pos": "WR"}, {"name": "Barion Brown", "team": "New Orleans Saints", "bye": 8, "pos": "WR"}, {"name": "Mason Tipton", "team": "New Orleans Saints", "bye": 8, "pos": "WR"}, {"name": "Juwan Johnson", "team": "New Orleans Saints", "bye": 8, "pos": "TE"}, {"name": "Noah Fant", "team": "New Orleans Saints", "bye": 8, "pos": "TE"}, {"name": "Oscar Delp", "team": "New Orleans Saints", "bye": 8, "pos": "TE"}, {"name": "Jaxson Dart", "team": "New York Giants", "bye": 8, "pos": "QB"}, {"name": "Jameis Winston", "team": "New York Giants", "bye": 8, "pos": "QB"}, {"name": "Cam Skattebo", "team": "New York Giants", "bye": 8, "pos": "RB"}, {"name": "Tyrone Tracy Jr.", "team": "New York Giants", "bye": 8, "pos": "RB"}, {"name": "Devin Singletary", "team": "New York Giants", "bye": 8, "pos": "RB"}, {"name": "Patrick Ricard", "team": "New York Giants", "bye": 8, "pos": "RB"}, {"name": "Malik Nabers", "team": "New York Giants", "bye": 8, "pos": "WR"}, {"name": "Darnell Mooney", "team": "New York Giants", "bye": 8, "pos": "WR"}, {"name": "Darius Slayton", "team": "New York Giants", "bye": 8, "pos": "WR"}, {"name": "Odell Beckham Jr.", "team": "New York Giants", "bye": 8, "pos": "WR"}, {"name": "Malachi Fields", "team": "New York Giants", "bye": 8, "pos": "WR"}, {"name": "Calvin Austin III", "team": "New York Giants", "bye": 8, "pos": "WR"}, {"name": "Braxton Berrios", "team": "New York Giants", "bye": 8, "pos": "WR"}, {"name": "JuJu Smith-Schuster", "team": "New York Giants", "bye": 8, "pos": "WR"}, {"name": "Isaiah Likely", "team": "New York Giants", "bye": 8, "pos": "TE"}, {"name": "Theo Johnson", "team": "New York Giants", "bye": 8, "pos": "TE"}, {"name": "Chris Manhertz", "team": "New York Giants", "bye": 8, "pos": "TE"}, {"name": "Geno Smith", "team": "New York Jets", "bye": 13, "pos": "QB"}, {"name": "Cade Klubnik", "team": "New York Jets", "bye": 13, "pos": "QB"}, {"name": "Breece Hall", "team": "New York Jets", "bye": 13, "pos": "RB"}, {"name": "Braelon Allen", "team": "New York Jets", "bye": 13, "pos": "RB"}, {"name": "Isaiah Davis", "team": "New York Jets", "bye": 13, "pos": "RB"}, {"name": "Andrew Beck", "team": "New York Jets", "bye": 13, "pos": "RB"}, {"name": "Kene Nwangwu", "team": "New York Jets", "bye": 13, "pos": "RB"}, {"name": "Garrett Wilson", "team": "New York Jets", "bye": 13, "pos": "WR"}, {"name": "Adonai Mitchell", "team": "New York Jets", "bye": 13, "pos": "WR"}, {"name": "Omar Cooper Jr.", "team": "New York Jets", "bye": 13, "pos": "WR"}, {"name": "Isaiah Williams", "team": "New York Jets", "bye": 13, "pos": "WR"}, {"name": "Arian Smith", "team": "New York Jets", "bye": 13, "pos": "WR"}, {"name": "Kenyon Sadiq", "team": "New York Jets", "bye": 13, "pos": "TE"}, {"name": "Mason Taylor", "team": "New York Jets", "bye": 13, "pos": "TE"}, {"name": "Jeremy Ruckert", "team": "New York Jets", "bye": 13, "pos": "TE"}, {"name": "Jalen Hurts", "team": "Philadelphia Eagles", "bye": 10, "pos": "QB"}, {"name": "Tanner McKee", "team": "Philadelphia Eagles", "bye": 10, "pos": "QB"}, {"name": "Saquon Barkley", "team": "Philadelphia Eagles", "bye": 10, "pos": "RB"}, {"name": "Tank Bigsby", "team": "Philadelphia Eagles", "bye": 10, "pos": "RB"}, {"name": "Will Shipley", "team": "Philadelphia Eagles", "bye": 10, "pos": "RB"}, {"name": "DeVonta Smith", "team": "Philadelphia Eagles", "bye": 10, "pos": "WR"}, {"name": "Makai Lemon", "team": "Philadelphia Eagles", "bye": 10, "pos": "WR"}, {"name": "Dontayvion Wicks", "team": "Philadelphia Eagles", "bye": 10, "pos": "WR"}, {"name": "Marquise Brown", "team": "Philadelphia Eagles", "bye": 10, "pos": "WR"}, {"name": "Darius Cooper", "team": "Philadelphia Eagles", "bye": 10, "pos": "WR"}, {"name": "Britain Covey", "team": "Philadelphia Eagles", "bye": 10, "pos": "WR"}, {"name": "Dallas Goedert", "team": "Philadelphia Eagles", "bye": 10, "pos": "TE"}, {"name": "Eli Stowers", "team": "Philadelphia Eagles", "bye": 10, "pos": "TE"}, {"name": "Johnny Mundt", "team": "Philadelphia Eagles", "bye": 10, "pos": "TE"}, {"name": "Aaron Rodgers", "team": "Pittsburgh Steelers", "bye": 9, "pos": "QB"}, {"name": "Drew Allar", "team": "Pittsburgh Steelers", "bye": 9, "pos": "QB"}, {"name": "Jaylen Warren", "team": "Pittsburgh Steelers", "bye": 9, "pos": "RB"}, {"name": "Rico Dowdle", "team": "Pittsburgh Steelers", "bye": 9, "pos": "RB"}, {"name": "Riley Nowakowski", "team": "Pittsburgh Steelers", "bye": 9, "pos": "RB"}, {"name": "Kaleb Johnson", "team": "Pittsburgh Steelers", "bye": 9, "pos": "RB"}, {"name": "Michael Pittman Jr.", "team": "Pittsburgh Steelers", "bye": 9, "pos": "WR"}, {"name": "DK Metcalf", "team": "Pittsburgh Steelers", "bye": 9, "pos": "WR"}, {"name": "Germie Bernard", "team": "Pittsburgh Steelers", "bye": 9, "pos": "WR"}, {"name": "Ben Skowronek", "team": "Pittsburgh Steelers", "bye": 9, "pos": "WR"}, {"name": "Kaden Wetjen", "team": "Pittsburgh Steelers", "bye": 9, "pos": "WR"}, {"name": "Pat Freiermuth", "team": "Pittsburgh Steelers", "bye": 9, "pos": "TE"}, {"name": "Darnell Washington", "team": "Pittsburgh Steelers", "bye": 9, "pos": "TE"}, {"name": "Sam Darnold", "team": "Seattle Seahawks", "bye": 11, "pos": "QB"}, {"name": "Drew Lock", "team": "Seattle Seahawks", "bye": 11, "pos": "QB"}, {"name": "Jadarian Price", "team": "Seattle Seahawks", "bye": 11, "pos": "RB"}, {"name": "Zach Charbonnet", "team": "Seattle Seahawks", "bye": 11, "pos": "RB"}, {"name": "George Holani", "team": "Seattle Seahawks", "bye": 11, "pos": "RB"}, {"name": "Emanuel Wilson", "team": "Seattle Seahawks", "bye": 11, "pos": "RB"}, {"name": "Jaxon Smith-Njigba", "team": "Seattle Seahawks", "bye": 11, "pos": "WR"}, {"name": "Rashid Shaheed", "team": "Seattle Seahawks", "bye": 11, "pos": "WR"}, {"name": "Cooper Kupp", "team": "Seattle Seahawks", "bye": 11, "pos": "WR"}, {"name": "Tory Horton", "team": "Seattle Seahawks", "bye": 11, "pos": "WR"}, {"name": "A.J. Barner", "team": "Seattle Seahawks", "bye": 11, "pos": "TE"}, {"name": "Elijah Arroyo", "team": "Seattle Seahawks", "bye": 11, "pos": "TE"}, {"name": "Eric Saubert", "team": "Seattle Seahawks", "bye": 11, "pos": "TE"}, {"name": "Brock Purdy", "team": "San Francisco 49ers", "bye": 8, "pos": "QB"}, {"name": "Mac Jones", "team": "San Francisco 49ers", "bye": 8, "pos": "QB"}, {"name": "Christian McCaffrey", "team": "San Francisco 49ers", "bye": 8, "pos": "RB"}, {"name": "Jordan James", "team": "San Francisco 49ers", "bye": 8, "pos": "RB"}, {"name": "Kyle Juszczyk", "team": "San Francisco 49ers", "bye": 8, "pos": "RB"}, {"name": "Kaelon Black", "team": "San Francisco 49ers", "bye": 8, "pos": "RB"}, {"name": "Isaac Guerendo", "team": "San Francisco 49ers", "bye": 8, "pos": "RB"}, {"name": "Mike Evans", "team": "San Francisco 49ers", "bye": 8, "pos": "WR"}, {"name": "Deebo Samuel", "team": "San Francisco 49ers", "bye": 8, "pos": "WR"}, {"name": "De'Zhaun Stribling", "team": "San Francisco 49ers", "bye": 8, "pos": "WR"}, {"name": "Christian Kirk", "team": "San Francisco 49ers", "bye": 8, "pos": "WR"}, {"name": "Demarcus Robinson", "team": "San Francisco 49ers", "bye": 8, "pos": "WR"}, {"name": "Jacob Cowing", "team": "San Francisco 49ers", "bye": 8, "pos": "WR"}, {"name": "George Kittle", "team": "San Francisco 49ers", "bye": 8, "pos": "TE"}, {"name": "Jake Tonges", "team": "San Francisco 49ers", "bye": 8, "pos": "TE"}, {"name": "Luke Farrell", "team": "San Francisco 49ers", "bye": 8, "pos": "TE"}, {"name": "Baker Mayfield", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "QB"}, {"name": "Jake Browning", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "QB"}, {"name": "Bucky Irving", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "RB"}, {"name": "Kenneth Gainwell", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "RB"}, {"name": "Sean Tucker", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "RB"}, {"name": "Josh Williams", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "RB"}, {"name": "Emeka Egbuka", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "WR"}, {"name": "Chris Godwin", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "WR"}, {"name": "Jalen McMillan", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "WR"}, {"name": "Ted Hurst", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "WR"}, {"name": "Tez Johnson", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "WR"}, {"name": "Kameron Johnson", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "WR"}, {"name": "Cade Otton", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "TE"}, {"name": "Payne Durham", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "TE"}, {"name": "Ko Kieft", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "TE"}, {"name": "Cameron Ward", "team": "Tennessee Titans", "bye": 9, "pos": "QB"}, {"name": "Mitchell Trubisky", "team": "Tennessee Titans", "bye": 9, "pos": "QB"}, {"name": "Tony Pollard", "team": "Tennessee Titans", "bye": 9, "pos": "RB"}, {"name": "Tyjae Spears", "team": "Tennessee Titans", "bye": 9, "pos": "RB"}, {"name": "Nicholas Singleton", "team": "Tennessee Titans", "bye": 9, "pos": "RB"}, {"name": "Carnell Tate", "team": "Tennessee Titans", "bye": 9, "pos": "WR"}, {"name": "Wan'Dale Robinson", "team": "Tennessee Titans", "bye": 9, "pos": "WR"}, {"name": "Calvin Ridley", "team": "Tennessee Titans", "bye": 9, "pos": "WR"}, {"name": "Chimere Dike", "team": "Tennessee Titans", "bye": 9, "pos": "WR"}, {"name": "Elic Ayomanor", "team": "Tennessee Titans", "bye": 9, "pos": "WR"}, {"name": "Mason Kinsey", "team": "Tennessee Titans", "bye": 9, "pos": "WR"}, {"name": "Gunnar Helm", "team": "Tennessee Titans", "bye": 9, "pos": "TE"}, {"name": "Daniel Bellinger", "team": "Tennessee Titans", "bye": 9, "pos": "TE"}, {"name": "Jayden Daniels", "team": "Washington Commanders", "bye": 7, "pos": "QB"}, {"name": "Marcus Mariota", "team": "Washington Commanders", "bye": 7, "pos": "QB"}, {"name": "Rachaad White", "team": "Washington Commanders", "bye": 7, "pos": "RB"}, {"name": "Jacory Croskey-Merritt", "team": "Washington Commanders", "bye": 7, "pos": "RB"}, {"name": "Kaytron Allen", "team": "Washington Commanders", "bye": 7, "pos": "RB"}, {"name": "Terry McLaurin", "team": "Washington Commanders", "bye": 7, "pos": "WR"}, {"name": "Antonio Williams", "team": "Washington Commanders", "bye": 7, "pos": "WR"}, {"name": "Dyami Brown", "team": "Washington Commanders", "bye": 7, "pos": "WR"}, {"name": "Treylon Burks", "team": "Washington Commanders", "bye": 7, "pos": "WR"}, {"name": "Jaylin Lane", "team": "Washington Commanders", "bye": 7, "pos": "WR"}, {"name": "Luke McCaffrey", "team": "Washington Commanders", "bye": 7, "pos": "WR"}, {"name": "Chigoziem Okonkwo", "team": "Washington Commanders", "bye": 7, "pos": "TE"}, {"name": "John Bates", "team": "Washington Commanders", "bye": 7, "pos": "TE"}, {"name": "Ben Sinnott", "team": "Washington Commanders", "bye": 7, "pos": "TE"}, {"name": "Cardinals", "team": "Arizona Cardinals", "bye": 14, "pos": "D"}, {"name": "Falcons", "team": "Atlanta Falcons", "bye": 11, "pos": "D"}, {"name": "Ravens", "team": "Baltimore Ravens", "bye": 13, "pos": "D"}, {"name": "Bills", "team": "Buffalo Bills", "bye": 7, "pos": "D"}, {"name": "Panthers", "team": "Carolina Panthers", "bye": 5, "pos": "D"}, {"name": "Bears", "team": "Chicago Bears", "bye": 10, "pos": "D"}, {"name": "Bengals", "team": "Cincinnati Bengals", "bye": 6, "pos": "D"}, {"name": "Browns", "team": "Cleveland Browns", "bye": 11, "pos": "D"}, {"name": "Cowboys", "team": "Dallas Cowboys", "bye": 14, "pos": "D"}, {"name": "Broncos", "team": "Denver Broncos", "bye": 10, "pos": "D"}, {"name": "Lions", "team": "Detroit Lions", "bye": 6, "pos": "D"}, {"name": "Packers", "team": "Green Bay Packers", "bye": 11, "pos": "D"}, {"name": "Texans", "team": "Houston Texans", "bye": 8, "pos": "D"}, {"name": "Colts", "team": "Indianapolis Colts", "bye": 13, "pos": "D"}, {"name": "Jaguars", "team": "Jacksonville Jaguars", "bye": 7, "pos": "D"}, {"name": "Chiefs", "team": "Kansas City Chiefs", "bye": 5, "pos": "D"}, {"name": "Raiders", "team": "Las Vegas Raiders", "bye": 13, "pos": "D"}, {"name": "Chargers", "team": "Los Angeles Chargers", "bye": 7, "pos": "D"}, {"name": "Rams", "team": "Los Angeles Rams", "bye": 11, "pos": "D"}, {"name": "Dolphins", "team": "Miami Dolphins", "bye": 6, "pos": "D"}, {"name": "Vikings", "team": "Minnesota Vikings", "bye": 6, "pos": "D"}, {"name": "Patriots", "team": "New England Patriots", "bye": 11, "pos": "D"}, {"name": "Saints", "team": "New Orleans Saints", "bye": 8, "pos": "D"}, {"name": "Giants", "team": "New York Giants", "bye": 8, "pos": "D"}, {"name": "Jets", "team": "New York Jets", "bye": 13, "pos": "D"}, {"name": "Eagles", "team": "Philadelphia Eagles", "bye": 10, "pos": "D"}, {"name": "Steelers", "team": "Pittsburgh Steelers", "bye": 9, "pos": "D"}, {"name": "49ers", "team": "San Francisco 49ers", "bye": 8, "pos": "D"}, {"name": "Seahawks", "team": "Seattle Seahawks", "bye": 11, "pos": "D"}, {"name": "Buccaneers", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "D"}, {"name": "Titans", "team": "Tennessee Titans", "bye": 9, "pos": "D"}, {"name": "Commanders", "team": "Washington Commanders", "bye": 7, "pos": "D"}, {"name": "Chad Ryland", "team": "Arizona Cardinals", "bye": 14, "pos": "K"}, {"name": "Nick Folk", "team": "Atlanta Falcons", "bye": 11, "pos": "K"}, {"name": "Tyler Loop", "team": "Baltimore Ravens", "bye": 13, "pos": "K"}, {"name": "Tyler Bass", "team": "Buffalo Bills", "bye": 7, "pos": "K"}, {"name": "Ryan Fitzgerald", "team": "Carolina Panthers", "bye": 5, "pos": "K"}, {"name": "Cairo Santos", "team": "Chicago Bears", "bye": 10, "pos": "K"}, {"name": "Evan McPherson", "team": "Cincinnati Bengals", "bye": 6, "pos": "K"}, {"name": "Andre Szmyt", "team": "Cleveland Browns", "bye": 11, "pos": "K"}, {"name": "Brandon Aubrey", "team": "Dallas Cowboys", "bye": 14, "pos": "K"}, {"name": "Wil Lutz", "team": "Denver Broncos", "bye": 10, "pos": "K"}, {"name": "Jake Bates", "team": "Detroit Lions", "bye": 6, "pos": "K"}, {"name": "Trey Smack", "team": "Green Bay Packers", "bye": 11, "pos": "K"}, {"name": "Ka'imi Fairbairn", "team": "Houston Texans", "bye": 8, "pos": "K"}, {"name": "Spencer Shrader", "team": "Indianapolis Colts", "bye": 13, "pos": "K"}, {"name": "Cam Little", "team": "Jacksonville Jaguars", "bye": 7, "pos": "K"}, {"name": "Harrison Butker", "team": "Kansas City Chiefs", "bye": 5, "pos": "K"}, {"name": "Matt Gay", "team": "Las Vegas Raiders", "bye": 13, "pos": "K"}, {"name": "Cameron Dicker", "team": "Los Angeles Chargers", "bye": 7, "pos": "K"}, {"name": "Harrison Mevis", "team": "Los Angeles Rams", "bye": 11, "pos": "K"}, {"name": "Riley Patterson", "team": "Miami Dolphins", "bye": 6, "pos": "K"}, {"name": "Will Reichard", "team": "Minnesota Vikings", "bye": 6, "pos": "K"}, {"name": "Andres Borregales", "team": "New England Patriots", "bye": 11, "pos": "K"}, {"name": "Charlie Smyth", "team": "New Orleans Saints", "bye": 8, "pos": "K"}, {"name": "Ben Sauls", "team": "New York Giants", "bye": 8, "pos": "K"}, {"name": "Jason Sanders", "team": "New York Jets", "bye": 13, "pos": "K"}, {"name": "Jake Elliott", "team": "Philadelphia Eagles", "bye": 10, "pos": "K"}, {"name": "Chris Boswell", "team": "Pittsburgh Steelers", "bye": 9, "pos": "K"}, {"name": "Jason Myers", "team": "Seattle Seahawks", "bye": 11, "pos": "K"}, {"name": "Eddy Pineiro", "team": "San Francisco 49ers", "bye": 8, "pos": "K"}, {"name": "Chase McLaughlin", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "K"}, {"name": "Joey Slye", "team": "Tennessee Titans", "bye": 9, "pos": "K"}, {"name": "Jake Moody", "team": "Washington Commanders", "bye": 7, "pos": "K"}, {"name": "WTFIT?-1", "team": "N/A", "bye": null, "pos": "ATH"}, {"name": "WTFIT?-2", "team": "N/A", "bye": null, "pos": "ATH"}, {"name": "WTFIT?-3", "team": "N/A", "bye": null, "pos": "ATH"}, {"name": "TOKEN SC", "team": "N/A", "bye": null, "pos": "N/A"}, {"name": "SITTIN SC", "team": "N/A", "bye": null, "pos": "N/A"}];
+const APP_PIN = '1019'; // shared PIN — gates both first-time site access and Reset
+
+// ---------- Site access lock (shown once per browser session) ----------
+const LOCK_SESSION_KEY = 'draftCommandCenter_unlocked';
+const lockOverlay = document.getElementById('lockOverlay');
+const lockPinInput = document.getElementById('lockPinInput');
+const lockError = document.getElementById('lockError');
+const lockSubmitBtn = document.getElementById('lockSubmitBtn');
+
+function unlockSite() {
+  try { sessionStorage.setItem(LOCK_SESSION_KEY, '1'); } catch (e) { /* ignore */ }
+  lockOverlay.classList.add('unlocked');
+}
+
+function trySessionUnlock() {
+  try {
+    if (sessionStorage.getItem(LOCK_SESSION_KEY) === '1') unlockSite();
+  } catch (e) { /* ignore — just stays locked and asks for the PIN */ }
+}
+trySessionUnlock();
+
+lockSubmitBtn.addEventListener('click', () => {
+  if (lockPinInput.value.trim() !== APP_PIN) {
+    lockError.textContent = 'Incorrect PIN. Try again.';
+    lockPinInput.value = '';
+    lockPinInput.focus();
+    return;
+  }
+  unlockSite();
+});
+lockPinInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') lockSubmitBtn.click();
+});
+
+const PLAYERS = [{"name": "Jacoby Brissett", "team": "Arizona Cardinals", "bye": 14, "pos": "QB"}, {"name": "Carson Beck", "team": "Arizona Cardinals", "bye": 14, "pos": "QB"}, {"name": "Gardner Minshew", "team": "Arizona Cardinals", "bye": 14, "pos": "QB"}, {"name": "Jeremiyah Love", "team": "Arizona Cardinals", "bye": 14, "pos": "RB"}, {"name": "Tyler Allgeier", "team": "Arizona Cardinals", "bye": 14, "pos": "RB"}, {"name": "Bam Knight", "team": "Arizona Cardinals", "bye": 14, "pos": "RB"}, {"name": "Marvin Harrison Jr.", "team": "Arizona Cardinals", "bye": 14, "pos": "WR"}, {"name": "Michael Wilson", "team": "Arizona Cardinals", "bye": 14, "pos": "WR"}, {"name": "Kendrick Bourne", "team": "Arizona Cardinals", "bye": 14, "pos": "WR"}, {"name": "Reggie Virgil", "team": "Arizona Cardinals", "bye": 14, "pos": "WR"}, {"name": "Devin Duvernay", "team": "Arizona Cardinals", "bye": 14, "pos": "WR"}, {"name": "Jalen Brooks", "team": "Arizona Cardinals", "bye": 14, "pos": "WR"}, {"name": "Trey McBride", "team": "Arizona Cardinals", "bye": 14, "pos": "TE"}, {"name": "Elijah Higgins", "team": "Arizona Cardinals", "bye": 14, "pos": "TE"}, {"name": "Tip Reiman", "team": "Arizona Cardinals", "bye": 14, "pos": "TE"}, {"name": "Tua Tagovailoa", "team": "Atlanta Falcons", "bye": 11, "pos": "QB"}, {"name": "Michael Penix Jr.", "team": "Atlanta Falcons", "bye": 11, "pos": "QB"}, {"name": "Bijan Robinson", "team": "Atlanta Falcons", "bye": 11, "pos": "RB"}, {"name": "Brian Robinson Jr.", "team": "Atlanta Falcons", "bye": 11, "pos": "RB"}, {"name": "Drake London", "team": "Atlanta Falcons", "bye": 11, "pos": "WR"}, {"name": "Zachariah Branch", "team": "Atlanta Falcons", "bye": 11, "pos": "WR"}, {"name": "Jahan Dotson", "team": "Atlanta Falcons", "bye": 11, "pos": "WR"}, {"name": "Olamide Zaccheaus", "team": "Atlanta Falcons", "bye": 11, "pos": "WR"}, {"name": "Kyle Pitts", "team": "Atlanta Falcons", "bye": 11, "pos": "TE"}, {"name": "Austin Hooper", "team": "Atlanta Falcons", "bye": 11, "pos": "TE"}, {"name": "Charlie Woerner", "team": "Atlanta Falcons", "bye": 11, "pos": "TE"}, {"name": "Lamar Jackson", "team": "Baltimore Ravens", "bye": 13, "pos": "QB"}, {"name": "Tyler Huntley", "team": "Baltimore Ravens", "bye": 13, "pos": "QB"}, {"name": "Derrick Henry", "team": "Baltimore Ravens", "bye": 13, "pos": "RB"}, {"name": "Justice Hill", "team": "Baltimore Ravens", "bye": 13, "pos": "RB"}, {"name": "Adam Randall", "team": "Baltimore Ravens", "bye": 13, "pos": "RB"}, {"name": "Rasheen Ali", "team": "Baltimore Ravens", "bye": 13, "pos": "RB"}, {"name": "Zay Flowers", "team": "Baltimore Ravens", "bye": 13, "pos": "WR"}, {"name": "Rashod Bateman", "team": "Baltimore Ravens", "bye": 13, "pos": "WR"}, {"name": "Ja'Kobi Lane", "team": "Baltimore Ravens", "bye": 13, "pos": "WR"}, {"name": "Elijah Sarratt", "team": "Baltimore Ravens", "bye": 13, "pos": "WR"}, {"name": "Devontez Walker", "team": "Baltimore Ravens", "bye": 13, "pos": "WR"}, {"name": "LaJohntay Wester", "team": "Baltimore Ravens", "bye": 13, "pos": "WR"}, {"name": "Mark Andrews", "team": "Baltimore Ravens", "bye": 13, "pos": "TE"}, {"name": "Durham Smythe", "team": "Baltimore Ravens", "bye": 13, "pos": "TE"}, {"name": "Josh Cuevas", "team": "Baltimore Ravens", "bye": 13, "pos": "TE"}, {"name": "Matthew Hibner", "team": "Baltimore Ravens", "bye": 13, "pos": "TE"}, {"name": "Josh Allen", "team": "Buffalo Bills", "bye": 7, "pos": "QB"}, {"name": "Kyle Allen", "team": "Buffalo Bills", "bye": 7, "pos": "QB"}, {"name": "James Cook", "team": "Buffalo Bills", "bye": 7, "pos": "RB"}, {"name": "Ty Johnson", "team": "Buffalo Bills", "bye": 7, "pos": "RB"}, {"name": "Ray Davis", "team": "Buffalo Bills", "bye": 7, "pos": "RB"}, {"name": "DJ Moore", "team": "Buffalo Bills", "bye": 7, "pos": "WR"}, {"name": "Khalil Shakir", "team": "Buffalo Bills", "bye": 7, "pos": "WR"}, {"name": "Keon Coleman", "team": "Buffalo Bills", "bye": 7, "pos": "WR"}, {"name": "Josh Palmer", "team": "Buffalo Bills", "bye": 7, "pos": "WR"}, {"name": "Skyler Bell", "team": "Buffalo Bills", "bye": 7, "pos": "WR"}, {"name": "Tyrell Shavers", "team": "Buffalo Bills", "bye": 7, "pos": "WR"}, {"name": "Dalton Kincaid", "team": "Buffalo Bills", "bye": 7, "pos": "TE"}, {"name": "Dawson Knox", "team": "Buffalo Bills", "bye": 7, "pos": "TE"}, {"name": "Jackson Hawes", "team": "Buffalo Bills", "bye": 7, "pos": "TE"}, {"name": "Bryce Young", "team": "Carolina Panthers", "bye": 5, "pos": "QB"}, {"name": "Kenny Pickett", "team": "Carolina Panthers", "bye": 5, "pos": "QB"}, {"name": "Chuba Hubbard", "team": "Carolina Panthers", "bye": 5, "pos": "RB"}, {"name": "Jonathon Brooks", "team": "Carolina Panthers", "bye": 5, "pos": "RB"}, {"name": "Trevor Etienne", "team": "Carolina Panthers", "bye": 5, "pos": "RB"}, {"name": "Tetairoa McMillan", "team": "Carolina Panthers", "bye": 5, "pos": "WR"}, {"name": "Jalen Coker", "team": "Carolina Panthers", "bye": 5, "pos": "WR"}, {"name": "Xavier Legette", "team": "Carolina Panthers", "bye": 5, "pos": "WR"}, {"name": "Jimmy Horn Jr.", "team": "Carolina Panthers", "bye": 5, "pos": "WR"}, {"name": "Brycen Tremayne", "team": "Carolina Panthers", "bye": 5, "pos": "WR"}, {"name": "Ja'Tavion Sanders", "team": "Carolina Panthers", "bye": 5, "pos": "TE"}, {"name": "Tommy Tremble", "team": "Carolina Panthers", "bye": 5, "pos": "TE"}, {"name": "Mitchell Evans", "team": "Carolina Panthers", "bye": 5, "pos": "TE"}, {"name": "Caleb Williams", "team": "Chicago Bears", "bye": 10, "pos": "QB"}, {"name": "Tyson Bagent", "team": "Chicago Bears", "bye": 10, "pos": "QB"}, {"name": "D'Andre Swift", "team": "Chicago Bears", "bye": 10, "pos": "RB"}, {"name": "Kyle Monangai", "team": "Chicago Bears", "bye": 10, "pos": "RB"}, {"name": "Rome Odunze", "team": "Chicago Bears", "bye": 10, "pos": "WR"}, {"name": "Luther Burden III", "team": "Chicago Bears", "bye": 10, "pos": "WR"}, {"name": "Kalif Raymond", "team": "Chicago Bears", "bye": 10, "pos": "WR"}, {"name": "Zavion Thomas", "team": "Chicago Bears", "bye": 10, "pos": "WR"}, {"name": "Jahdae Walker", "team": "Chicago Bears", "bye": 10, "pos": "WR"}, {"name": "Colston Loveland", "team": "Chicago Bears", "bye": 10, "pos": "TE"}, {"name": "Cole Kmet", "team": "Chicago Bears", "bye": 10, "pos": "TE"}, {"name": "Sam Roush", "team": "Chicago Bears", "bye": 10, "pos": "TE"}, {"name": "Joe Burrow", "team": "Cincinnati Bengals", "bye": 6, "pos": "QB"}, {"name": "Joe Flacco", "team": "Cincinnati Bengals", "bye": 6, "pos": "QB"}, {"name": "Chase Brown", "team": "Cincinnati Bengals", "bye": 6, "pos": "RB"}, {"name": "Samaje Perine", "team": "Cincinnati Bengals", "bye": 6, "pos": "RB"}, {"name": "Tahj Brooks", "team": "Cincinnati Bengals", "bye": 6, "pos": "RB"}, {"name": "Ja'Marr Chase", "team": "Cincinnati Bengals", "bye": 6, "pos": "WR"}, {"name": "Tee Higgins", "team": "Cincinnati Bengals", "bye": 6, "pos": "WR"}, {"name": "Andrei Iosivas", "team": "Cincinnati Bengals", "bye": 6, "pos": "WR"}, {"name": "Mitchell Tinsley", "team": "Cincinnati Bengals", "bye": 6, "pos": "WR"}, {"name": "Colbie Young", "team": "Cincinnati Bengals", "bye": 6, "pos": "WR"}, {"name": "Charlie Jones", "team": "Cincinnati Bengals", "bye": 6, "pos": "WR"}, {"name": "Ke'Shawn Williams", "team": "Cincinnati Bengals", "bye": 6, "pos": "WR"}, {"name": "Mike Gesicki", "team": "Cincinnati Bengals", "bye": 6, "pos": "TE"}, {"name": "Erick All", "team": "Cincinnati Bengals", "bye": 6, "pos": "TE"}, {"name": "Drew Sample", "team": "Cincinnati Bengals", "bye": 6, "pos": "TE"}, {"name": "Tanner Hudson", "team": "Cincinnati Bengals", "bye": 6, "pos": "TE"}, {"name": "Deshaun Watson", "team": "Cleveland Browns", "bye": 11, "pos": "QB"}, {"name": "Shedeur Sanders", "team": "Cleveland Browns", "bye": 11, "pos": "QB"}, {"name": "Quinshon Judkins", "team": "Cleveland Browns", "bye": 11, "pos": "RB"}, {"name": "Dylan Sampson", "team": "Cleveland Browns", "bye": 11, "pos": "RB"}, {"name": "Michael Burton", "team": "Cleveland Browns", "bye": 11, "pos": "RB"}, {"name": "KC Concepcion", "team": "Cleveland Browns", "bye": 11, "pos": "WR"}, {"name": "Jerry Jeudy", "team": "Cleveland Browns", "bye": 11, "pos": "WR"}, {"name": "Denzel Boston", "team": "Cleveland Browns", "bye": 11, "pos": "WR"}, {"name": "Isaiah Bond", "team": "Cleveland Browns", "bye": 11, "pos": "WR"}, {"name": "Malachi Corley", "team": "Cleveland Browns", "bye": 11, "pos": "WR"}, {"name": "Cedric Tillman", "team": "Cleveland Browns", "bye": 11, "pos": "WR"}, {"name": "Gage Larvadain", "team": "Cleveland Browns", "bye": 11, "pos": "WR"}, {"name": "Harold Fannin Jr.", "team": "Cleveland Browns", "bye": 11, "pos": "TE"}, {"name": "Joe Royer", "team": "Cleveland Browns", "bye": 11, "pos": "TE"}, {"name": "Jack Stoll", "team": "Cleveland Browns", "bye": 11, "pos": "TE"}, {"name": "Dak Prescott", "team": "Dallas Cowboys", "bye": 14, "pos": "QB"}, {"name": "Sam Howell", "team": "Dallas Cowboys", "bye": 14, "pos": "QB"}, {"name": "Javonte Williams", "team": "Dallas Cowboys", "bye": 14, "pos": "RB"}, {"name": "Jaydon Blue", "team": "Dallas Cowboys", "bye": 14, "pos": "RB"}, {"name": "Malik Davis", "team": "Dallas Cowboys", "bye": 14, "pos": "RB"}, {"name": "Hunter Luepke", "team": "Dallas Cowboys", "bye": 14, "pos": "RB"}, {"name": "CeeDee Lamb", "team": "Dallas Cowboys", "bye": 14, "pos": "WR"}, {"name": "George Pickens", "team": "Dallas Cowboys", "bye": 14, "pos": "WR"}, {"name": "Ryan Flournoy", "team": "Dallas Cowboys", "bye": 14, "pos": "WR"}, {"name": "Kavontae Turpin", "team": "Dallas Cowboys", "bye": 14, "pos": "WR"}, {"name": "Jonathan Mingo", "team": "Dallas Cowboys", "bye": 14, "pos": "WR"}, {"name": "Jake Ferguson", "team": "Dallas Cowboys", "bye": 14, "pos": "TE"}, {"name": "Luke Schoonmaker", "team": "Dallas Cowboys", "bye": 14, "pos": "TE"}, {"name": "Brevyn Spann-Ford", "team": "Dallas Cowboys", "bye": 14, "pos": "TE"}, {"name": "Bo Nix", "team": "Denver Broncos", "bye": 10, "pos": "QB"}, {"name": "Jarrett Stidham", "team": "Denver Broncos", "bye": 10, "pos": "QB"}, {"name": "J.K. Dobbins", "team": "Denver Broncos", "bye": 10, "pos": "RB"}, {"name": "RJ Harvey", "team": "Denver Broncos", "bye": 10, "pos": "RB"}, {"name": "Jonah Coleman", "team": "Denver Broncos", "bye": 10, "pos": "RB"}, {"name": "Tyler Badie", "team": "Denver Broncos", "bye": 10, "pos": "RB"}, {"name": "Adam Prentice", "team": "Denver Broncos", "bye": 10, "pos": "RB"}, {"name": "Jaylen Waddle", "team": "Denver Broncos", "bye": 10, "pos": "WR"}, {"name": "Courtland Sutton", "team": "Denver Broncos", "bye": 10, "pos": "WR"}, {"name": "Pat Bryant", "team": "Denver Broncos", "bye": 10, "pos": "WR"}, {"name": "Marvin Mims", "team": "Denver Broncos", "bye": 10, "pos": "WR"}, {"name": "Troy Franklin", "team": "Denver Broncos", "bye": 10, "pos": "WR"}, {"name": "Michael Bandy", "team": "Denver Broncos", "bye": 10, "pos": "WR"}, {"name": "Evan Engram", "team": "Denver Broncos", "bye": 10, "pos": "TE"}, {"name": "Adam Trautman", "team": "Denver Broncos", "bye": 10, "pos": "TE"}, {"name": "Nate Adkins", "team": "Denver Broncos", "bye": 10, "pos": "TE"}, {"name": "Justin Joly", "team": "Denver Broncos", "bye": 10, "pos": "TE"}, {"name": "Jared Goff", "team": "Detroit Lions", "bye": 6, "pos": "QB"}, {"name": "Teddy Bridgewater", "team": "Detroit Lions", "bye": 6, "pos": "QB"}, {"name": "Jahmyr Gibbs", "team": "Detroit Lions", "bye": 6, "pos": "RB"}, {"name": "Isiah Pacheco", "team": "Detroit Lions", "bye": 6, "pos": "RB"}, {"name": "Jacob Saylors", "team": "Detroit Lions", "bye": 6, "pos": "RB"}, {"name": "Amon-Ra St. Brown", "team": "Detroit Lions", "bye": 6, "pos": "WR"}, {"name": "Jameson Williams", "team": "Detroit Lions", "bye": 6, "pos": "WR"}, {"name": "Isaac TeSlaa", "team": "Detroit Lions", "bye": 6, "pos": "WR"}, {"name": "Greg Dortch", "team": "Detroit Lions", "bye": 6, "pos": "WR"}, {"name": "Sam LaPorta", "team": "Detroit Lions", "bye": 6, "pos": "TE"}, {"name": "Brock Wright", "team": "Detroit Lions", "bye": 6, "pos": "TE"}, {"name": "Tyler Conklin", "team": "Detroit Lions", "bye": 6, "pos": "TE"}, {"name": "Jordan Love", "team": "Green Bay Packers", "bye": 11, "pos": "QB"}, {"name": "Tyrod Taylor", "team": "Green Bay Packers", "bye": 11, "pos": "QB"}, {"name": "Josh Jacobs", "team": "Green Bay Packers", "bye": 11, "pos": "RB"}, {"name": "MarShawn Lloyd", "team": "Green Bay Packers", "bye": 11, "pos": "RB"}, {"name": "Chris Brooks", "team": "Green Bay Packers", "bye": 11, "pos": "RB"}, {"name": "Christian Watson", "team": "Green Bay Packers", "bye": 11, "pos": "WR"}, {"name": "Matthew Golden", "team": "Green Bay Packers", "bye": 11, "pos": "WR"}, {"name": "Jayden Reed", "team": "Green Bay Packers", "bye": 11, "pos": "WR"}, {"name": "Savion Williams", "team": "Green Bay Packers", "bye": 11, "pos": "WR"}, {"name": "Bo Melton", "team": "Green Bay Packers", "bye": 11, "pos": "WR"}, {"name": "Skyy Moore", "team": "Green Bay Packers", "bye": 11, "pos": "WR"}, {"name": "Tucker Kraft", "team": "Green Bay Packers", "bye": 11, "pos": "TE"}, {"name": "Luke Musgrave", "team": "Green Bay Packers", "bye": 11, "pos": "TE"}, {"name": "C.J. Stroud", "team": "Houston Texans", "bye": 8, "pos": "QB"}, {"name": "Davis Mills", "team": "Houston Texans", "bye": 8, "pos": "QB"}, {"name": "David Montgomery", "team": "Houston Texans", "bye": 8, "pos": "RB"}, {"name": "Woody Marks", "team": "Houston Texans", "bye": 8, "pos": "RB"}, {"name": "Jawhar Jordan", "team": "Houston Texans", "bye": 8, "pos": "RB"}, {"name": "British Brooks", "team": "Houston Texans", "bye": 8, "pos": "RB"}, {"name": "Nico Collins", "team": "Houston Texans", "bye": 8, "pos": "WR"}, {"name": "Jayden Higgins", "team": "Houston Texans", "bye": 8, "pos": "WR"}, {"name": "Tank Dell", "team": "Houston Texans", "bye": 8, "pos": "WR"}, {"name": "Jaylin Noel", "team": "Houston Texans", "bye": 8, "pos": "WR"}, {"name": "Xavier Hutchinson", "team": "Houston Texans", "bye": 8, "pos": "WR"}, {"name": "Justin Watson", "team": "Houston Texans", "bye": 8, "pos": "WR"}, {"name": "Dalton Schultz", "team": "Houston Texans", "bye": 8, "pos": "TE"}, {"name": "Cade Stover", "team": "Houston Texans", "bye": 8, "pos": "TE"}, {"name": "Foster Moreau", "team": "Houston Texans", "bye": 8, "pos": "TE"}, {"name": "Marlin Klein", "team": "Houston Texans", "bye": 8, "pos": "TE"}, {"name": "Daniel Jones", "team": "Indianapolis Colts", "bye": 13, "pos": "QB"}, {"name": "Riley Leonard", "team": "Indianapolis Colts", "bye": 13, "pos": "QB"}, {"name": "Jonathan Taylor", "team": "Indianapolis Colts", "bye": 13, "pos": "RB"}, {"name": "DJ Giddens", "team": "Indianapolis Colts", "bye": 13, "pos": "RB"}, {"name": "Seth McGowan", "team": "Indianapolis Colts", "bye": 13, "pos": "RB"}, {"name": "Alec Pierce", "team": "Indianapolis Colts", "bye": 13, "pos": "WR"}, {"name": "Josh Downs", "team": "Indianapolis Colts", "bye": 13, "pos": "WR"}, {"name": "Nick Westbrook-Ikhine", "team": "Indianapolis Colts", "bye": 13, "pos": "WR"}, {"name": "Ashton Dulin", "team": "Indianapolis Colts", "bye": 13, "pos": "WR"}, {"name": "Anthony Gould", "team": "Indianapolis Colts", "bye": 13, "pos": "WR"}, {"name": "Laquon Treadwell", "team": "Indianapolis Colts", "bye": 13, "pos": "WR"}, {"name": "Tyler Warren", "team": "Indianapolis Colts", "bye": 13, "pos": "TE"}, {"name": "Mo Alie-Cox", "team": "Indianapolis Colts", "bye": 13, "pos": "TE"}, {"name": "Andrew Ogletree", "team": "Indianapolis Colts", "bye": 13, "pos": "TE"}, {"name": "Trevor Lawrence", "team": "Jacksonville Jaguars", "bye": 7, "pos": "QB"}, {"name": "Nick Mullens", "team": "Jacksonville Jaguars", "bye": 7, "pos": "QB"}, {"name": "Bhayshul Tuten", "team": "Jacksonville Jaguars", "bye": 7, "pos": "RB"}, {"name": "Chris Rodriguez", "team": "Jacksonville Jaguars", "bye": 7, "pos": "RB"}, {"name": "LeQuint Allen", "team": "Jacksonville Jaguars", "bye": 7, "pos": "RB"}, {"name": "DeeJay Dallas", "team": "Jacksonville Jaguars", "bye": 7, "pos": "RB"}, {"name": "Parker Washington", "team": "Jacksonville Jaguars", "bye": 7, "pos": "WR"}, {"name": "Jakobi Meyers", "team": "Jacksonville Jaguars", "bye": 7, "pos": "WR"}, {"name": "Brian Thomas Jr.", "team": "Jacksonville Jaguars", "bye": 7, "pos": "WR"}, {"name": "Travis Hunter", "team": "Jacksonville Jaguars", "bye": 7, "pos": "WR"}, {"name": "Josh Cameron", "team": "Jacksonville Jaguars", "bye": 7, "pos": "WR"}, {"name": "Brenton Strange", "team": "Jacksonville Jaguars", "bye": 7, "pos": "TE"}, {"name": "Nate Boerkircher", "team": "Jacksonville Jaguars", "bye": 7, "pos": "TE"}, {"name": "Tanner Koziol", "team": "Jacksonville Jaguars", "bye": 7, "pos": "TE"}, {"name": "Patrick Mahomes", "team": "Kansas City Chiefs", "bye": 5, "pos": "QB"}, {"name": "Justin Fields", "team": "Kansas City Chiefs", "bye": 5, "pos": "QB"}, {"name": "Ken Walker III", "team": "Kansas City Chiefs", "bye": 5, "pos": "RB"}, {"name": "Emari Demercado", "team": "Kansas City Chiefs", "bye": 5, "pos": "RB"}, {"name": "Emmett Johnson", "team": "Kansas City Chiefs", "bye": 5, "pos": "RB"}, {"name": "Brashard Smith", "team": "Kansas City Chiefs", "bye": 5, "pos": "RB"}, {"name": "Rashee Rice", "team": "Kansas City Chiefs", "bye": 5, "pos": "WR"}, {"name": "Xavier Worthy", "team": "Kansas City Chiefs", "bye": 5, "pos": "WR"}, {"name": "Tyquan Thornton", "team": "Kansas City Chiefs", "bye": 5, "pos": "WR"}, {"name": "Cyrus Allen", "team": "Kansas City Chiefs", "bye": 5, "pos": "WR"}, {"name": "Jalen Royals", "team": "Kansas City Chiefs", "bye": 5, "pos": "WR"}, {"name": "Nikko Remigio", "team": "Kansas City Chiefs", "bye": 5, "pos": "WR"}, {"name": "Travis Kelce", "team": "Kansas City Chiefs", "bye": 5, "pos": "TE"}, {"name": "Noah Gray", "team": "Kansas City Chiefs", "bye": 5, "pos": "TE"}, {"name": "Justin Herbert", "team": "Los Angeles Chargers", "bye": 7, "pos": "QB"}, {"name": "Trey Lance", "team": "Los Angeles Chargers", "bye": 7, "pos": "QB"}, {"name": "Omarion Hampton", "team": "Los Angeles Chargers", "bye": 7, "pos": "RB"}, {"name": "Keaton Mitchell", "team": "Los Angeles Chargers", "bye": 7, "pos": "RB"}, {"name": "Kimani Vidal", "team": "Los Angeles Chargers", "bye": 7, "pos": "RB"}, {"name": "Alec Ingold", "team": "Los Angeles Chargers", "bye": 7, "pos": "RB"}, {"name": "Ladd McConkey", "team": "Los Angeles Chargers", "bye": 7, "pos": "WR"}, {"name": "Quentin Johnston", "team": "Los Angeles Chargers", "bye": 7, "pos": "WR"}, {"name": "Tre Harris", "team": "Los Angeles Chargers", "bye": 7, "pos": "WR"}, {"name": "Brenen Thompson", "team": "Los Angeles Chargers", "bye": 7, "pos": "WR"}, {"name": "KeAndre Lambert-Smith", "team": "Los Angeles Chargers", "bye": 7, "pos": "WR"}, {"name": "Derius Davis", "team": "Los Angeles Chargers", "bye": 7, "pos": "WR"}, {"name": "Oronde Gadsden II", "team": "Los Angeles Chargers", "bye": 7, "pos": "TE"}, {"name": "David Njoku", "team": "Los Angeles Chargers", "bye": 7, "pos": "TE"}, {"name": "Charlie Kolar", "team": "Los Angeles Chargers", "bye": 7, "pos": "TE"}, {"name": "Matthew Stafford", "team": "Los Angeles Rams", "bye": 11, "pos": "QB"}, {"name": "Ty Simpson", "team": "Los Angeles Rams", "bye": 11, "pos": "QB"}, {"name": "Kyren Williams", "team": "Los Angeles Rams", "bye": 11, "pos": "RB"}, {"name": "Blake Corum", "team": "Los Angeles Rams", "bye": 11, "pos": "RB"}, {"name": "Puka Nacua", "team": "Los Angeles Rams", "bye": 11, "pos": "WR"}, {"name": "Davante Adams", "team": "Los Angeles Rams", "bye": 11, "pos": "WR"}, {"name": "Jordan Whittington", "team": "Los Angeles Rams", "bye": 11, "pos": "WR"}, {"name": "Konata Mumpfield", "team": "Los Angeles Rams", "bye": 11, "pos": "WR"}, {"name": "Xavier Smith", "team": "Los Angeles Rams", "bye": 11, "pos": "WR"}, {"name": "CJ Daniels", "team": "Los Angeles Rams", "bye": 11, "pos": "WR"}, {"name": "Terrance Ferguson", "team": "Los Angeles Rams", "bye": 11, "pos": "TE"}, {"name": "Colby Parkinson", "team": "Los Angeles Rams", "bye": 11, "pos": "TE"}, {"name": "Tyler Higbee", "team": "Los Angeles Rams", "bye": 11, "pos": "TE"}, {"name": "Davis Allen", "team": "Los Angeles Rams", "bye": 11, "pos": "TE"}, {"name": "Max Klare", "team": "Los Angeles Rams", "bye": 11, "pos": "TE"}, {"name": "Fernando Mendoza", "team": "Las Vegas Raiders", "bye": 13, "pos": "QB"}, {"name": "Kirk Cousins", "team": "Las Vegas Raiders", "bye": 13, "pos": "QB"}, {"name": "Ashton Jeanty", "team": "Las Vegas Raiders", "bye": 13, "pos": "RB"}, {"name": "Mike Washington Jr.", "team": "Las Vegas Raiders", "bye": 13, "pos": "RB"}, {"name": "Connor Heyward", "team": "Las Vegas Raiders", "bye": 13, "pos": "RB"}, {"name": "Dylan Laube", "team": "Las Vegas Raiders", "bye": 13, "pos": "RB"}, {"name": "Tre Tucker", "team": "Las Vegas Raiders", "bye": 13, "pos": "WR"}, {"name": "Jalen Nailor", "team": "Las Vegas Raiders", "bye": 13, "pos": "WR"}, {"name": "Jack Bech", "team": "Las Vegas Raiders", "bye": 13, "pos": "WR"}, {"name": "Dont'e Thornton Jr.", "team": "Las Vegas Raiders", "bye": 13, "pos": "WR"}, {"name": "Malik Benson", "team": "Las Vegas Raiders", "bye": 13, "pos": "WR"}, {"name": "Dareke Young", "team": "Las Vegas Raiders", "bye": 13, "pos": "WR"}, {"name": "Brock Bowers", "team": "Las Vegas Raiders", "bye": 13, "pos": "TE"}, {"name": "Michael Mayer", "team": "Las Vegas Raiders", "bye": 13, "pos": "TE"}, {"name": "Ian Thomas", "team": "Las Vegas Raiders", "bye": 13, "pos": "TE"}, {"name": "Malik Willis", "team": "Miami Dolphins", "bye": 6, "pos": "QB"}, {"name": "Quinn Ewers", "team": "Miami Dolphins", "bye": 6, "pos": "QB"}, {"name": "De'Von Achane", "team": "Miami Dolphins", "bye": 6, "pos": "RB"}, {"name": "Jaylen Wright", "team": "Miami Dolphins", "bye": 6, "pos": "RB"}, {"name": "Ollie Gordon II", "team": "Miami Dolphins", "bye": 6, "pos": "RB"}, {"name": "Malik Washington", "team": "Miami Dolphins", "bye": 6, "pos": "WR"}, {"name": "Jalen Tolbert", "team": "Miami Dolphins", "bye": 6, "pos": "WR"}, {"name": "Chris Bell", "team": "Miami Dolphins", "bye": 6, "pos": "WR"}, {"name": "Caleb Douglas", "team": "Miami Dolphins", "bye": 6, "pos": "WR"}, {"name": "Tutu Atwell", "team": "Miami Dolphins", "bye": 6, "pos": "WR"}, {"name": "Kevin Coleman Jr.", "team": "Miami Dolphins", "bye": 6, "pos": "WR"}, {"name": "Greg Dulcich", "team": "Miami Dolphins", "bye": 6, "pos": "TE"}, {"name": "Will Kacmarek", "team": "Miami Dolphins", "bye": 6, "pos": "TE"}, {"name": "Ben Sims", "team": "Miami Dolphins", "bye": 6, "pos": "TE"}, {"name": "Kyler Murray", "team": "Minnesota Vikings", "bye": 6, "pos": "QB"}, {"name": "J.J. McCarthy", "team": "Minnesota Vikings", "bye": 6, "pos": "QB"}, {"name": "Aaron Jones", "team": "Minnesota Vikings", "bye": 6, "pos": "RB"}, {"name": "Jordan Mason", "team": "Minnesota Vikings", "bye": 6, "pos": "RB"}, {"name": "Demond Claiborne", "team": "Minnesota Vikings", "bye": 6, "pos": "RB"}, {"name": "Max Bredeson", "team": "Minnesota Vikings", "bye": 6, "pos": "RB"}, {"name": "Justin Jefferson", "team": "Minnesota Vikings", "bye": 6, "pos": "WR"}, {"name": "Jordan Addison", "team": "Minnesota Vikings", "bye": 6, "pos": "WR"}, {"name": "Jauan Jennings", "team": "Minnesota Vikings", "bye": 6, "pos": "WR"}, {"name": "Tai Felton", "team": "Minnesota Vikings", "bye": 6, "pos": "WR"}, {"name": "Myles Price", "team": "Minnesota Vikings", "bye": 6, "pos": "WR"}, {"name": "Jeshaun Jones", "team": "Minnesota Vikings", "bye": 6, "pos": "WR"}, {"name": "T.J. Hockenson", "team": "Minnesota Vikings", "bye": 6, "pos": "TE"}, {"name": "Josh Oliver", "team": "Minnesota Vikings", "bye": 6, "pos": "TE"}, {"name": "Drake Maye", "team": "New England Patriots", "bye": 11, "pos": "QB"}, {"name": "Tommy DeVito", "team": "New England Patriots", "bye": 11, "pos": "QB"}, {"name": "TreVeyon Henderson", "team": "New England Patriots", "bye": 11, "pos": "RB"}, {"name": "Rhamondre Stevenson", "team": "New England Patriots", "bye": 11, "pos": "RB"}, {"name": "Reggie Gilliam", "team": "New England Patriots", "bye": 11, "pos": "RB"}, {"name": "A.J. Brown", "team": "New England Patriots", "bye": 11, "pos": "WR"}, {"name": "Romeo Doubs", "team": "New England Patriots", "bye": 11, "pos": "WR"}, {"name": "Kayshon Boutte", "team": "New England Patriots", "bye": 11, "pos": "WR"}, {"name": "DeMario Douglas", "team": "New England Patriots", "bye": 11, "pos": "WR"}, {"name": "Mack Hollins", "team": "New England Patriots", "bye": 11, "pos": "WR"}, {"name": "Kyle T. Williams", "team": "New England Patriots", "bye": 11, "pos": "WR"}, {"name": "Efton Chism III", "team": "New England Patriots", "bye": 11, "pos": "WR"}, {"name": "Hunter Henry", "team": "New England Patriots", "bye": 11, "pos": "TE"}, {"name": "Eli Raridon", "team": "New England Patriots", "bye": 11, "pos": "TE"}, {"name": "CJ Dippre", "team": "New England Patriots", "bye": 11, "pos": "TE"}, {"name": "Tyler Shough", "team": "New Orleans Saints", "bye": 8, "pos": "QB"}, {"name": "Spencer Rattler", "team": "New Orleans Saints", "bye": 8, "pos": "QB"}, {"name": "Travis Etienne", "team": "New Orleans Saints", "bye": 8, "pos": "RB"}, {"name": "Alvin Kamara", "team": "New Orleans Saints", "bye": 8, "pos": "RB"}, {"name": "Kendre Miller", "team": "New Orleans Saints", "bye": 8, "pos": "RB"}, {"name": "Chris Olave", "team": "New Orleans Saints", "bye": 8, "pos": "WR"}, {"name": "Jordyn Tyson", "team": "New Orleans Saints", "bye": 8, "pos": "WR"}, {"name": "Devaughn Vele", "team": "New Orleans Saints", "bye": 8, "pos": "WR"}, {"name": "Bryce Lance", "team": "New Orleans Saints", "bye": 8, "pos": "WR"}, {"name": "Barion Brown", "team": "New Orleans Saints", "bye": 8, "pos": "WR"}, {"name": "Mason Tipton", "team": "New Orleans Saints", "bye": 8, "pos": "WR"}, {"name": "Juwan Johnson", "team": "New Orleans Saints", "bye": 8, "pos": "TE"}, {"name": "Noah Fant", "team": "New Orleans Saints", "bye": 8, "pos": "TE"}, {"name": "Oscar Delp", "team": "New Orleans Saints", "bye": 8, "pos": "TE"}, {"name": "Jaxson Dart", "team": "New York Giants", "bye": 8, "pos": "QB"}, {"name": "Jameis Winston", "team": "New York Giants", "bye": 8, "pos": "QB"}, {"name": "Cam Skattebo", "team": "New York Giants", "bye": 8, "pos": "RB"}, {"name": "Tyrone Tracy Jr.", "team": "New York Giants", "bye": 8, "pos": "RB"}, {"name": "Devin Singletary", "team": "New York Giants", "bye": 8, "pos": "RB"}, {"name": "Patrick Ricard", "team": "New York Giants", "bye": 8, "pos": "RB"}, {"name": "Malik Nabers", "team": "New York Giants", "bye": 8, "pos": "WR"}, {"name": "Darnell Mooney", "team": "New York Giants", "bye": 8, "pos": "WR"}, {"name": "Darius Slayton", "team": "New York Giants", "bye": 8, "pos": "WR"}, {"name": "Odell Beckham Jr.", "team": "New York Giants", "bye": 8, "pos": "WR"}, {"name": "Malachi Fields", "team": "New York Giants", "bye": 8, "pos": "WR"}, {"name": "Calvin Austin III", "team": "New York Giants", "bye": 8, "pos": "WR"}, {"name": "Braxton Berrios", "team": "New York Giants", "bye": 8, "pos": "WR"}, {"name": "JuJu Smith-Schuster", "team": "New York Giants", "bye": 8, "pos": "WR"}, {"name": "Isaiah Likely", "team": "New York Giants", "bye": 8, "pos": "TE"}, {"name": "Theo Johnson", "team": "New York Giants", "bye": 8, "pos": "TE"}, {"name": "Chris Manhertz", "team": "New York Giants", "bye": 8, "pos": "TE"}, {"name": "Geno Smith", "team": "New York Jets", "bye": 13, "pos": "QB"}, {"name": "Cade Klubnik", "team": "New York Jets", "bye": 13, "pos": "QB"}, {"name": "Breece Hall", "team": "New York Jets", "bye": 13, "pos": "RB"}, {"name": "Braelon Allen", "team": "New York Jets", "bye": 13, "pos": "RB"}, {"name": "Isaiah Davis", "team": "New York Jets", "bye": 13, "pos": "RB"}, {"name": "Andrew Beck", "team": "New York Jets", "bye": 13, "pos": "RB"}, {"name": "Kene Nwangwu", "team": "New York Jets", "bye": 13, "pos": "RB"}, {"name": "Garrett Wilson", "team": "New York Jets", "bye": 13, "pos": "WR"}, {"name": "Adonai Mitchell", "team": "New York Jets", "bye": 13, "pos": "WR"}, {"name": "Omar Cooper Jr.", "team": "New York Jets", "bye": 13, "pos": "WR"}, {"name": "Isaiah Williams", "team": "New York Jets", "bye": 13, "pos": "WR"}, {"name": "Arian Smith", "team": "New York Jets", "bye": 13, "pos": "WR"}, {"name": "Kenyon Sadiq", "team": "New York Jets", "bye": 13, "pos": "TE"}, {"name": "Mason Taylor", "team": "New York Jets", "bye": 13, "pos": "TE"}, {"name": "Jeremy Ruckert", "team": "New York Jets", "bye": 13, "pos": "TE"}, {"name": "Jalen Hurts", "team": "Philadelphia Eagles", "bye": 10, "pos": "QB"}, {"name": "Tanner McKee", "team": "Philadelphia Eagles", "bye": 10, "pos": "QB"}, {"name": "Saquon Barkley", "team": "Philadelphia Eagles", "bye": 10, "pos": "RB"}, {"name": "Tank Bigsby", "team": "Philadelphia Eagles", "bye": 10, "pos": "RB"}, {"name": "Will Shipley", "team": "Philadelphia Eagles", "bye": 10, "pos": "RB"}, {"name": "DeVonta Smith", "team": "Philadelphia Eagles", "bye": 10, "pos": "WR"}, {"name": "Makai Lemon", "team": "Philadelphia Eagles", "bye": 10, "pos": "WR"}, {"name": "Dontayvion Wicks", "team": "Philadelphia Eagles", "bye": 10, "pos": "WR"}, {"name": "Marquise Brown", "team": "Philadelphia Eagles", "bye": 10, "pos": "WR"}, {"name": "Darius Cooper", "team": "Philadelphia Eagles", "bye": 10, "pos": "WR"}, {"name": "Britain Covey", "team": "Philadelphia Eagles", "bye": 10, "pos": "WR"}, {"name": "Dallas Goedert", "team": "Philadelphia Eagles", "bye": 10, "pos": "TE"}, {"name": "Eli Stowers", "team": "Philadelphia Eagles", "bye": 10, "pos": "TE"}, {"name": "Johnny Mundt", "team": "Philadelphia Eagles", "bye": 10, "pos": "TE"}, {"name": "Aaron Rodgers", "team": "Pittsburgh Steelers", "bye": 9, "pos": "QB"}, {"name": "Drew Allar", "team": "Pittsburgh Steelers", "bye": 9, "pos": "QB"}, {"name": "Jaylen Warren", "team": "Pittsburgh Steelers", "bye": 9, "pos": "RB"}, {"name": "Rico Dowdle", "team": "Pittsburgh Steelers", "bye": 9, "pos": "RB"}, {"name": "Riley Nowakowski", "team": "Pittsburgh Steelers", "bye": 9, "pos": "RB"}, {"name": "Kaleb Johnson", "team": "Pittsburgh Steelers", "bye": 9, "pos": "RB"}, {"name": "Michael Pittman Jr.", "team": "Pittsburgh Steelers", "bye": 9, "pos": "WR"}, {"name": "DK Metcalf", "team": "Pittsburgh Steelers", "bye": 9, "pos": "WR"}, {"name": "Germie Bernard", "team": "Pittsburgh Steelers", "bye": 9, "pos": "WR"}, {"name": "Ben Skowronek", "team": "Pittsburgh Steelers", "bye": 9, "pos": "WR"}, {"name": "Kaden Wetjen", "team": "Pittsburgh Steelers", "bye": 9, "pos": "WR"}, {"name": "Pat Freiermuth", "team": "Pittsburgh Steelers", "bye": 9, "pos": "TE"}, {"name": "Darnell Washington", "team": "Pittsburgh Steelers", "bye": 9, "pos": "TE"}, {"name": "Sam Darnold", "team": "Seattle Seahawks", "bye": 11, "pos": "QB"}, {"name": "Drew Lock", "team": "Seattle Seahawks", "bye": 11, "pos": "QB"}, {"name": "Jadarian Price", "team": "Seattle Seahawks", "bye": 11, "pos": "RB"}, {"name": "Zach Charbonnet", "team": "Seattle Seahawks", "bye": 11, "pos": "RB"}, {"name": "George Holani", "team": "Seattle Seahawks", "bye": 11, "pos": "RB"}, {"name": "Emanuel Wilson", "team": "Seattle Seahawks", "bye": 11, "pos": "RB"}, {"name": "Jaxon Smith-Njigba", "team": "Seattle Seahawks", "bye": 11, "pos": "WR"}, {"name": "Rashid Shaheed", "team": "Seattle Seahawks", "bye": 11, "pos": "WR"}, {"name": "Cooper Kupp", "team": "Seattle Seahawks", "bye": 11, "pos": "WR"}, {"name": "Tory Horton", "team": "Seattle Seahawks", "bye": 11, "pos": "WR"}, {"name": "A.J. Barner", "team": "Seattle Seahawks", "bye": 11, "pos": "TE"}, {"name": "Elijah Arroyo", "team": "Seattle Seahawks", "bye": 11, "pos": "TE"}, {"name": "Eric Saubert", "team": "Seattle Seahawks", "bye": 11, "pos": "TE"}, {"name": "Brock Purdy", "team": "San Francisco 49ers", "bye": 8, "pos": "QB"}, {"name": "Mac Jones", "team": "San Francisco 49ers", "bye": 8, "pos": "QB"}, {"name": "Christian McCaffrey", "team": "San Francisco 49ers", "bye": 8, "pos": "RB"}, {"name": "Jordan James", "team": "San Francisco 49ers", "bye": 8, "pos": "RB"}, {"name": "Kyle Juszczyk", "team": "San Francisco 49ers", "bye": 8, "pos": "RB"}, {"name": "Kaelon Black", "team": "San Francisco 49ers", "bye": 8, "pos": "RB"}, {"name": "Isaac Guerendo", "team": "San Francisco 49ers", "bye": 8, "pos": "RB"}, {"name": "Mike Evans", "team": "San Francisco 49ers", "bye": 8, "pos": "WR"}, {"name": "Deebo Samuel", "team": "San Francisco 49ers", "bye": 8, "pos": "WR"}, {"name": "De'Zhaun Stribling", "team": "San Francisco 49ers", "bye": 8, "pos": "WR"}, {"name": "Christian Kirk", "team": "San Francisco 49ers", "bye": 8, "pos": "WR"}, {"name": "Demarcus Robinson", "team": "San Francisco 49ers", "bye": 8, "pos": "WR"}, {"name": "Jacob Cowing", "team": "San Francisco 49ers", "bye": 8, "pos": "WR"}, {"name": "George Kittle", "team": "San Francisco 49ers", "bye": 8, "pos": "TE"}, {"name": "Jake Tonges", "team": "San Francisco 49ers", "bye": 8, "pos": "TE"}, {"name": "Luke Farrell", "team": "San Francisco 49ers", "bye": 8, "pos": "TE"}, {"name": "Baker Mayfield", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "QB"}, {"name": "Jake Browning", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "QB"}, {"name": "Bucky Irving", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "RB"}, {"name": "Kenneth Gainwell", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "RB"}, {"name": "Sean Tucker", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "RB"}, {"name": "Josh Williams", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "RB"}, {"name": "Emeka Egbuka", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "WR"}, {"name": "Chris Godwin", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "WR"}, {"name": "Jalen McMillan", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "WR"}, {"name": "Ted Hurst", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "WR"}, {"name": "Tez Johnson", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "WR"}, {"name": "Kameron Johnson", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "WR"}, {"name": "Cade Otton", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "TE"}, {"name": "Payne Durham", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "TE"}, {"name": "Ko Kieft", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "TE"}, {"name": "Cameron Ward", "team": "Tennessee Titans", "bye": 9, "pos": "QB"}, {"name": "Mitchell Trubisky", "team": "Tennessee Titans", "bye": 9, "pos": "QB"}, {"name": "Tony Pollard", "team": "Tennessee Titans", "bye": 9, "pos": "RB"}, {"name": "Tyjae Spears", "team": "Tennessee Titans", "bye": 9, "pos": "RB"}, {"name": "Nicholas Singleton", "team": "Tennessee Titans", "bye": 9, "pos": "RB"}, {"name": "Carnell Tate", "team": "Tennessee Titans", "bye": 9, "pos": "WR"}, {"name": "Wan'Dale Robinson", "team": "Tennessee Titans", "bye": 9, "pos": "WR"}, {"name": "Calvin Ridley", "team": "Tennessee Titans", "bye": 9, "pos": "WR"}, {"name": "Chimere Dike", "team": "Tennessee Titans", "bye": 9, "pos": "WR"}, {"name": "Elic Ayomanor", "team": "Tennessee Titans", "bye": 9, "pos": "WR"}, {"name": "Mason Kinsey", "team": "Tennessee Titans", "bye": 9, "pos": "WR"}, {"name": "Gunnar Helm", "team": "Tennessee Titans", "bye": 9, "pos": "TE"}, {"name": "Daniel Bellinger", "team": "Tennessee Titans", "bye": 9, "pos": "TE"}, {"name": "Jayden Daniels", "team": "Washington Commanders", "bye": 7, "pos": "QB"}, {"name": "Marcus Mariota", "team": "Washington Commanders", "bye": 7, "pos": "QB"}, {"name": "Rachaad White", "team": "Washington Commanders", "bye": 7, "pos": "RB"}, {"name": "Jacory Croskey-Merritt", "team": "Washington Commanders", "bye": 7, "pos": "RB"}, {"name": "Kaytron Allen", "team": "Washington Commanders", "bye": 7, "pos": "RB"}, {"name": "Terry McLaurin", "team": "Washington Commanders", "bye": 7, "pos": "WR"}, {"name": "Antonio Williams", "team": "Washington Commanders", "bye": 7, "pos": "WR"}, {"name": "Dyami Brown", "team": "Washington Commanders", "bye": 7, "pos": "WR"}, {"name": "Treylon Burks", "team": "Washington Commanders", "bye": 7, "pos": "WR"}, {"name": "Jaylin Lane", "team": "Washington Commanders", "bye": 7, "pos": "WR"}, {"name": "Luke McCaffrey", "team": "Washington Commanders", "bye": 7, "pos": "WR"}, {"name": "Chigoziem Okonkwo", "team": "Washington Commanders", "bye": 7, "pos": "TE"}, {"name": "John Bates", "team": "Washington Commanders", "bye": 7, "pos": "TE"}, {"name": "Ben Sinnott", "team": "Washington Commanders", "bye": 7, "pos": "TE"}, {"name": "Cardinals", "team": "Arizona Cardinals", "bye": 14, "pos": "D"}, {"name": "Falcons", "team": "Atlanta Falcons", "bye": 11, "pos": "D"}, {"name": "Ravens", "team": "Baltimore Ravens", "bye": 13, "pos": "D"}, {"name": "Bills", "team": "Buffalo Bills", "bye": 7, "pos": "D"}, {"name": "Panthers", "team": "Carolina Panthers", "bye": 5, "pos": "D"}, {"name": "Bears", "team": "Chicago Bears", "bye": 10, "pos": "D"}, {"name": "Bengals", "team": "Cincinnati Bengals", "bye": 6, "pos": "D"}, {"name": "Browns", "team": "Cleveland Browns", "bye": 11, "pos": "D"}, {"name": "Cowboys", "team": "Dallas Cowboys", "bye": 14, "pos": "D"}, {"name": "Broncos", "team": "Denver Broncos", "bye": 10, "pos": "D"}, {"name": "Lions", "team": "Detroit Lions", "bye": 6, "pos": "D"}, {"name": "Packers", "team": "Green Bay Packers", "bye": 11, "pos": "D"}, {"name": "Texans", "team": "Houston Texans", "bye": 8, "pos": "D"}, {"name": "Colts", "team": "Indianapolis Colts", "bye": 13, "pos": "D"}, {"name": "Jaguars", "team": "Jacksonville Jaguars", "bye": 7, "pos": "D"}, {"name": "Chiefs", "team": "Kansas City Chiefs", "bye": 5, "pos": "D"}, {"name": "Raiders", "team": "Las Vegas Raiders", "bye": 13, "pos": "D"}, {"name": "Chargers", "team": "Los Angeles Chargers", "bye": 7, "pos": "D"}, {"name": "Rams", "team": "Los Angeles Rams", "bye": 11, "pos": "D"}, {"name": "Dolphins", "team": "Miami Dolphins", "bye": 6, "pos": "D"}, {"name": "Vikings", "team": "Minnesota Vikings", "bye": 6, "pos": "D"}, {"name": "Patriots", "team": "New England Patriots", "bye": 11, "pos": "D"}, {"name": "Saints", "team": "New Orleans Saints", "bye": 8, "pos": "D"}, {"name": "Giants", "team": "New York Giants", "bye": 8, "pos": "D"}, {"name": "Jets", "team": "New York Jets", "bye": 13, "pos": "D"}, {"name": "Eagles", "team": "Philadelphia Eagles", "bye": 10, "pos": "D"}, {"name": "Steelers", "team": "Pittsburgh Steelers", "bye": 9, "pos": "D"}, {"name": "49ers", "team": "San Francisco 49ers", "bye": 8, "pos": "D"}, {"name": "Seahawks", "team": "Seattle Seahawks", "bye": 11, "pos": "D"}, {"name": "Buccaneers", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "D"}, {"name": "Titans", "team": "Tennessee Titans", "bye": 9, "pos": "D"}, {"name": "Commanders", "team": "Washington Commanders", "bye": 7, "pos": "D"}, {"name": "Chad Ryland", "team": "Arizona Cardinals", "bye": 14, "pos": "K"}, {"name": "Nick Folk", "team": "Atlanta Falcons", "bye": 11, "pos": "K"}, {"name": "Tyler Loop", "team": "Baltimore Ravens", "bye": 13, "pos": "K"}, {"name": "Tyler Bass", "team": "Buffalo Bills", "bye": 7, "pos": "K"}, {"name": "Ryan Fitzgerald", "team": "Carolina Panthers", "bye": 5, "pos": "K"}, {"name": "Cairo Santos", "team": "Chicago Bears", "bye": 10, "pos": "K"}, {"name": "Evan McPherson", "team": "Cincinnati Bengals", "bye": 6, "pos": "K"}, {"name": "Andre Szmyt", "team": "Cleveland Browns", "bye": 11, "pos": "K"}, {"name": "Brandon Aubrey", "team": "Dallas Cowboys", "bye": 14, "pos": "K"}, {"name": "Wil Lutz", "team": "Denver Broncos", "bye": 10, "pos": "K"}, {"name": "Jake Bates", "team": "Detroit Lions", "bye": 6, "pos": "K"}, {"name": "Trey Smack", "team": "Green Bay Packers", "bye": 11, "pos": "K"}, {"name": "Ka'imi Fairbairn", "team": "Houston Texans", "bye": 8, "pos": "K"}, {"name": "Spencer Shrader", "team": "Indianapolis Colts", "bye": 13, "pos": "K"}, {"name": "Cam Little", "team": "Jacksonville Jaguars", "bye": 7, "pos": "K"}, {"name": "Harrison Butker", "team": "Kansas City Chiefs", "bye": 5, "pos": "K"}, {"name": "Matt Gay", "team": "Las Vegas Raiders", "bye": 13, "pos": "K"}, {"name": "Cameron Dicker", "team": "Los Angeles Chargers", "bye": 7, "pos": "K"}, {"name": "Harrison Mevis", "team": "Los Angeles Rams", "bye": 11, "pos": "K"}, {"name": "Riley Patterson", "team": "Miami Dolphins", "bye": 6, "pos": "K"}, {"name": "Will Reichard", "team": "Minnesota Vikings", "bye": 6, "pos": "K"}, {"name": "Andres Borregales", "team": "New England Patriots", "bye": 11, "pos": "K"}, {"name": "Charlie Smyth", "team": "New Orleans Saints", "bye": 8, "pos": "K"}, {"name": "Ben Sauls", "team": "New York Giants", "bye": 8, "pos": "K"}, {"name": "Jason Sanders", "team": "New York Jets", "bye": 13, "pos": "K"}, {"name": "Jake Elliott", "team": "Philadelphia Eagles", "bye": 10, "pos": "K"}, {"name": "Chris Boswell", "team": "Pittsburgh Steelers", "bye": 9, "pos": "K"}, {"name": "Eddy Pineiro", "team": "San Francisco 49ers", "bye": 8, "pos": "K"}, {"name": "Jason Myers", "team": "Seattle Seahawks", "bye": 11, "pos": "K"}, {"name": "Chase McLaughlin", "team": "Tampa Bay Buccaneers", "bye": 10, "pos": "K"}, {"name": "Joey Slye", "team": "Tennessee Titans", "bye": 9, "pos": "K"}, {"name": "Jake Moody", "team": "Washington Commanders", "bye": 7, "pos": "K"}, {"name": "WTFIT1", "team": "", "bye": null, "pos": "?"}, {"name": "WFTIT2", "team": "", "bye": null, "pos": "?"}, {"name": "WFTI3", "team": "", "bye": null, "pos": "?"}, {"name": "WTFIT4", "team": "", "bye": null, "pos": "?"}, {"name": "WTFIT5", "team": "", "bye": null, "pos": "?"}, {"name": "TOKEN CAP", "team": "", "bye": null, "pos": "C"}, {"name": "SD CAP", "team": "", "bye": null, "pos": "C"}];
+const POSITION_LEADERS = [
+  { pos: "QB", name: "Josh Allen", rank: 1 },
+  { pos: "RB", name: "Jahmyr Gibbs", rank: 1 },
+  { pos: "WR", name: "Puka Nacua", rank: 1 },
+  { pos: "TE", name: "Trey McBride", rank: 1 }
+];
 const TEAMS = ["BB", "BY", "DEI", "FISH", "GH", "KC", "MoP", "OS", "PGP", "SLP"];
 const SEED_PICKS = [{"player": "Jacoby Brissett", "nflTeam": "Arizona Cardinals", "bye": 14, "pos": "QB", "draftTeam": "FISH", "amt": 45}, {"player": "Josh Allen", "nflTeam": "Buffalo Bills", "bye": 7, "pos": "QB", "draftTeam": "BY", "amt": 12}, {"player": "Dak Prescott", "nflTeam": "Dallas Cowboys", "bye": 14, "pos": "QB", "draftTeam": "PGP", "amt": 4}, {"player": "Pat Bryant", "nflTeam": "Denver Broncos", "bye": 10, "pos": "WR", "draftTeam": "DEI", "amt": 24}, {"player": "Tee Higgins", "nflTeam": "Cincinnati Bengals", "bye": 6, "pos": "WR", "draftTeam": "FISH", "amt": 32}, {"player": "Derrick Henry", "nflTeam": "Baltimore Ravens", "bye": 13, "pos": "RB", "draftTeam": "GH", "amt": 6}, {"player": "Carson Beck", "nflTeam": "Arizona Cardinals", "bye": 14, "pos": "QB", "draftTeam": "KC", "amt": 15}, {"player": "Chase Brown", "nflTeam": "Cincinnati Bengals", "bye": 6, "pos": "RB", "draftTeam": "MoP", "amt": 42}, {"player": "Marvin Mims", "nflTeam": "Denver Broncos", "bye": 10, "pos": "WR", "draftTeam": "OS", "amt": 42}, {"player": "Reggie Virgil", "nflTeam": "Arizona Cardinals", "bye": 14, "pos": "WR", "draftTeam": "PGP", "amt": 28}, {"player": "Dawson Knox", "nflTeam": "Buffalo Bills", "bye": 7, "pos": "TE", "draftTeam": "SLP", "amt": 11}, {"player": "Zachariah Branch", "nflTeam": "Atlanta Falcons", "bye": 11, "pos": "WR", "draftTeam": "SLP", "amt": 32}, {"player": "Kendrick Bourne", "nflTeam": "Arizona Cardinals", "bye": 14, "pos": "WR", "draftTeam": "KC", "amt": 22}, {"player": "Ray Davis", "nflTeam": "Buffalo Bills", "bye": 7, "pos": "RB", "draftTeam": "PGP", "amt": 22}, {"player": "Caleb Williams", "nflTeam": "Chicago Bears", "bye": 10, "pos": "QB", "draftTeam": "BY", "amt": 19}, {"player": "Erick All", "nflTeam": "Cincinnati Bengals", "bye": 6, "pos": "TE", "draftTeam": "BY", "amt": 4}, {"player": "Matthew Hibner", "nflTeam": "Baltimore Ravens", "bye": 13, "pos": "TE", "draftTeam": "BB", "amt": 44}, {"player": "Cap Penalty", "nflTeam": "", "bye": null, "pos": null, "draftTeam": "SLP", "amt": 4}, {"player": "Cap Penalty", "nflTeam": "", "bye": null, "pos": null, "draftTeam": "DEI", "amt": 12}, {"player": "Bryce Young", "nflTeam": "Carolina Panthers", "bye": 5, "pos": "QB", "draftTeam": "BB", "amt": 44}, {"player": "Xavier Legette", "nflTeam": "Carolina Panthers", "bye": 5, "pos": "WR", "draftTeam": "GH", "amt": 44}, {"player": "Devin Duvernay", "nflTeam": "Arizona Cardinals", "bye": 14, "pos": "WR", "draftTeam": "SLP", "amt": 34}];
 const TOTAL_BUDGET = 200;
 
-const STORAGE_KEY = 'draftCommandCenter_verizon_picks_v1';
+const STORAGE_KEY = 'draftCommandCenter_verizon_picks_v1'; // local fallback only, used if Firebase can't be reached
 
-function loadPicks() {
+const firebaseConfig = {
+  apiKey: "AIzaSyD5AJc2Q3RVGN_LjGnMbh6JZyz4zfftlK4",
+  authDomain: "bring-em-young-live-dashboard.firebaseapp.com",
+  databaseURL: "https://bring-em-young-live-dashboard-default-rtdb.firebaseio.com",
+  projectId: "bring-em-young-live-dashboard",
+  storageBucket: "bring-em-young-live-dashboard.firebasestorage.app",
+  messagingSenderId: "241048327453",
+  appId: "1:241048327453:web:55e6f27f1d0613df07fdf4"
+};
+
+let picks = [];
+let firebaseEnabled = false;
+let picksRef = null;
+const syncStatusEl = document.getElementById('syncStatus');
+
+function setSyncStatus(text, ok) {
+  if (!syncStatusEl) return;
+  syncStatusEl.textContent = text;
+  syncStatusEl.style.color = ok ? 'var(--teal)' : 'var(--red)';
+}
+
+function loadPicksLocalFallback() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch (e) {
-    return []; // storage unavailable (e.g. private browsing, sandboxed preview) — fall back to in-memory only
+    return [];
   }
 }
 
-function savePicks() {
+function saveLocalFallback() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(picks));
-  } catch (e) {
-    // storage unavailable — picks still work for this session, just won't survive a reload
+  } catch (e) { /* nothing more we can do */ }
+}
+
+// Push the current local `picks` array up to every connected device.
+function syncPicks() {
+  if (firebaseEnabled && picksRef) {
+    picksRef.set(picks).catch(err => {
+      console.warn('Firebase write failed, saving locally instead.', err);
+      setSyncStatus('Sync failed — saved on this device only', false);
+      saveLocalFallback();
+    });
+  } else {
+    saveLocalFallback();
   }
 }
 
-let picks = loadPicks();
+try {
+  firebase.initializeApp(firebaseConfig);
+  picksRef = firebase.database().ref('verizon_picks');
+  firebaseEnabled = true;
+  setSyncStatus('Connecting…', true);
+
+  picksRef.on('value', (snapshot) => {
+    picks = snapshot.val() || [];
+    setSyncStatus('Synced across devices', true);
+    render();
+  }, (err) => {
+    console.warn('Firebase read failed, falling back to local storage.', err);
+    firebaseEnabled = false;
+    picks = loadPicksLocalFallback();
+    setSyncStatus('Sync unavailable — saved on this device only', false);
+    render();
+  });
+} catch (e) {
+  console.warn('Firebase unavailable, falling back to local storage only.', e);
+  picks = loadPicksLocalFallback();
+  setSyncStatus('Sync unavailable — saved on this device only', false);
+}
 
 const playerByName = {};
 PLAYERS.forEach(p => { playerByName[p.name.toLowerCase()] = p; });
@@ -656,16 +1009,21 @@ TEAMS.forEach(t => {
 });
 
 const playerInput = document.getElementById('playerInput');
+const onlyAvailableToggle = document.getElementById('onlyAvailableToggle');
 const suggestBox = document.getElementById('suggestBox');
 const nflTeamField = document.getElementById('nflTeam');
 const byeField = document.getElementById('byeWeek');
 const posField = document.getElementById('posField');
+const rankField = document.getElementById('rankField');
+const posSuggestBox = document.getElementById('posSuggestBox');
 const amtInput = document.getElementById('amtInput');
 const formMsg = document.getElementById('formMsg');
 const logBtn = document.getElementById('logBtn');
 const undoBtn = document.getElementById('undoBtn');
 
 let selectedPlayer = null; // the confirmed match, set only when a suggestion is chosen
+let posFilterValue = ''; // active Pos filter, e.g. "WR" — narrows the player search
+const POS_OPTIONS = ['QB', 'RB', 'WR', 'TE', 'K', 'D'];
 
 function isDrafted(name) {
   return picks.find(pk => pk.player.toLowerCase() === name.toLowerCase()) || null;
@@ -674,11 +1032,12 @@ function isDrafted(name) {
 function clearAutoFields() {
   nflTeamField.value = '';
   byeField.value = '';
-  posField.value = '';
+  rankField.value = '';
   selectedPlayer = null;
   nflTeamField.classList.remove('drafted-field');
   byeField.classList.remove('drafted-field');
   posField.classList.remove('drafted-field');
+  rankField.classList.remove('drafted-field');
   logBtn.disabled = false;
 }
 
@@ -687,14 +1046,20 @@ function applyPlayer(p) {
   nflTeamField.value = p.team;
   byeField.value = p.bye;
   posField.value = p.pos;
+  posFilterValue = p.pos;
   selectedPlayer = p;
   closeSuggestions();
+  closePosSuggestions();
+
+  const rk = RANK_LOOKUP[p.pos + '|' + p.name];
+  rankField.value = rk != null ? p.pos + rk : '—';
 
   const draftedPick = isDrafted(p.name);
   if (draftedPick) {
     nflTeamField.classList.add('drafted-field');
     byeField.classList.add('drafted-field');
     posField.classList.add('drafted-field');
+    rankField.classList.add('drafted-field');
     formMsg.textContent = `Already drafted by ${draftedPick.draftTeam} for $${draftedPick.amt}.`;
     formMsg.className = 'msg error';
     logBtn.disabled = true;
@@ -702,6 +1067,7 @@ function applyPlayer(p) {
     nflTeamField.classList.remove('drafted-field');
     byeField.classList.remove('drafted-field');
     posField.classList.remove('drafted-field');
+    rankField.classList.remove('drafted-field');
     formMsg.textContent = '';
     logBtn.disabled = false;
   }
@@ -715,8 +1081,65 @@ function closeSuggestions() {
 // Search only the Player-name field (Rosters column 1), never team/pos/bye.
 function searchPlayers(query) {
   const q = query.trim().toLowerCase();
-  if (!q) return [];
-  return PLAYERS.filter(p => p.name.toLowerCase().includes(q)).slice(0, 8);
+  let pool = PLAYERS;
+  if (onlyAvailableToggle.checked) {
+    pool = pool.filter(p => !isDrafted(p.name));
+  }
+  if (posFilterValue) {
+    pool = pool.filter(p => p.pos === posFilterValue);
+  }
+  if (!q) {
+    // no name typed: with a Pos filter active, browse that position A-Z instead of showing nothing
+    return posFilterValue ? pool.slice().sort((a, b) => a.name.localeCompare(b.name)).slice(0, 8) : [];
+  }
+  return pool.filter(p => p.name.toLowerCase().includes(q)).slice(0, 8);
+}
+
+function searchPositions(query) {
+  const q = query.trim().toUpperCase();
+  if (!q) return POS_OPTIONS;
+  return POS_OPTIONS.filter(p => p.includes(q));
+}
+
+function closePosSuggestions() {
+  posSuggestBox.classList.remove('open');
+  posSuggestBox.innerHTML = '';
+}
+
+function renderPosSuggestions(matches) {
+  posSuggestBox.innerHTML = '';
+  if (matches.length === 0) {
+    posSuggestBox.innerHTML = '<div class="suggest-empty">No matching position.</div>';
+    posSuggestBox.classList.add('open');
+    return;
+  }
+  matches.forEach(pos => {
+    const item = document.createElement('div');
+    item.className = 'suggest-item';
+    item.innerHTML = `<span class="sname">${pos}</span>`;
+    item.addEventListener('mousedown', (e) => { e.preventDefault(); applyPosFilter(pos); });
+    posSuggestBox.appendChild(item);
+  });
+  posSuggestBox.classList.add('open');
+}
+
+function applyPosFilter(pos) {
+  clearAutoFields();
+  posField.value = pos;
+  posFilterValue = pos;
+  closePosSuggestions();
+  renderSuggestions(searchPlayers(playerInput.value));
+}
+
+// Positions/bye-weeks BY already has rostered — used to flag search-result
+// players who'd create a bye-week clash with BY's existing roster.
+function getByReferenceByes() {
+  const map = {};
+  picks.filter(pk => pk.draftTeam === 'BY' && pk.pos && pk.bye != null).forEach(pk => {
+    if (!map[pk.pos]) map[pk.pos] = new Set();
+    map[pk.pos].add(pk.bye);
+  });
+  return map;
 }
 
 function renderSuggestions(matches) {
@@ -726,12 +1149,19 @@ function renderSuggestions(matches) {
     suggestBox.classList.add('open');
     return;
   }
+  const byRefByes = getByReferenceByes();
   matches.forEach(p => {
     const draftedPick = isDrafted(p.name);
     const item = document.createElement('div');
     item.className = 'suggest-item' + (draftedPick ? ' drafted' : '');
-    const tag = draftedPick ? `Drafted · ${draftedPick.draftTeam}` : `${p.pos} · Bye ${p.bye}`;
-    item.innerHTML = `<span class="sname">${p.name}</span><span class="stag">${tag}</span>`;
+    let tag, tagClass = 'stag';
+    if (draftedPick) {
+      tag = `Drafted · ${draftedPick.draftTeam}`;
+    } else {
+      tag = `${p.pos} · Bye ${p.bye}`;
+      if (byRefByes[p.pos] && byRefByes[p.pos].has(p.bye)) tagClass += ' stag-conflict';
+    }
+    item.innerHTML = `<span class="sname">${p.name}</span><span class="${tagClass}">${tag}</span>`;
     item.addEventListener('mousedown', (e) => { e.preventDefault(); applyPlayer(p); });
     suggestBox.appendChild(item);
   });
@@ -740,17 +1170,46 @@ function renderSuggestions(matches) {
 
 playerInput.addEventListener('input', () => {
   clearAutoFields();
-  const matches = searchPlayers(playerInput.value);
-  if (playerInput.value.trim() === '') { closeSuggestions(); return; }
-  renderSuggestions(matches);
+  if (playerInput.value.trim() === '' && !posFilterValue) { closeSuggestions(); return; }
+  renderSuggestions(searchPlayers(playerInput.value));
 });
 
 playerInput.addEventListener('focus', () => {
-  if (playerInput.value.trim() !== '') renderSuggestions(searchPlayers(playerInput.value));
+  if (playerInput.value.trim() !== '' || posFilterValue) renderSuggestions(searchPlayers(playerInput.value));
+});
+
+onlyAvailableToggle.addEventListener('change', () => {
+  if (playerInput.value.trim() !== '' || posFilterValue) renderSuggestions(searchPlayers(playerInput.value));
+});
+
+posField.addEventListener('input', () => {
+  clearAutoFields();
+  posFilterValue = posField.value.trim().toUpperCase();
+  renderPosSuggestions(searchPositions(posField.value));
+  renderSuggestions(searchPlayers(playerInput.value));
+});
+
+posField.addEventListener('focus', () => {
+  renderPosSuggestions(searchPositions(posField.value));
 });
 
 document.addEventListener('click', (e) => {
-  if (!e.target.closest('.field')) closeSuggestions();
+  if (!e.target.closest('.field')) {
+    closeSuggestions();
+    closePosSuggestions();
+  }
+});
+
+const clearFormBtn = document.getElementById('clearFormBtn');
+clearFormBtn.addEventListener('click', () => {
+  playerInput.value = '';
+  posField.value = '';
+  posFilterValue = '';
+  draftTeamSelect.value = '';
+  clearAutoFields();
+  closeSuggestions();
+  closePosSuggestions();
+  formMsg.textContent = '';
 });
 
 function teamStats(code) {
@@ -760,63 +1219,114 @@ function teamStats(code) {
   return { spent, left: TOTAL_BUDGET - spent, slots };
 }
 
+// Smooth green -> yellow -> orange -> deep red as a team's cap runs out (pct = fraction of $200 left).
+const CAP_COLOR_STOPS = [
+  { stop: 1.00, rgb: [45, 212, 191] },   // green/teal — full cap
+  { stop: 0.66, rgb: [250, 204, 21] },   // yellow
+  { stop: 0.33, rgb: [251, 146, 60] },   // orange
+  { stop: 0.00, rgb: [220, 38, 38] }     // deep red — empty cap (brighter)
+];
 function gaugeColor(pct) {
-  if (pct > 0.5) return '#2DD4BF';
-  if (pct > 0.2) return '#F2B134';
-  return '#FB7185';
+  const p = Math.max(0, Math.min(1, pct));
+  for (let i = 0; i < CAP_COLOR_STOPS.length - 1; i++) {
+    const a = CAP_COLOR_STOPS[i];
+    const b = CAP_COLOR_STOPS[i + 1];
+    if (p <= a.stop && p >= b.stop) {
+      const span = a.stop - b.stop;
+      const t = span === 0 ? 0 : (a.stop - p) / span; // 0 at a, 1 at b
+      const r = Math.round(a.rgb[0] + (b.rgb[0] - a.rgb[0]) * t);
+      const g = Math.round(a.rgb[1] + (b.rgb[1] - a.rgb[1]) * t);
+      const bl = Math.round(a.rgb[2] + (b.rgb[2] - a.rgb[2]) * t);
+      return `rgb(${r}, ${g}, ${bl})`;
+    }
+  }
+  return `rgb(${CAP_COLOR_STOPS[0].rgb.join(', ')})`;
 }
 
-function buildPickRow(pk) {
+function buildPickRow(pk, hasByeConflict) {
   const row = document.createElement('div');
   row.className = 'pick-row';
   row.innerHTML = `
     <span class="pos-chip">${pk.pos || '—'}</span>
     <span class="pname">${pk.player}</span>
-    <span class="pbye">${pk.bye != null ? pk.bye : '—'}</span>
+    <span class="pbye${hasByeConflict ? ' conflict' : ''}" title="${hasByeConflict ? 'Bye-week clash with another ' + pk.pos + ' on this roster' : ''}">${pk.bye != null ? pk.bye : '—'}</span>
     <span class="pamt">$${pk.amt}</span>
-    <button class="del-pick-btn" title="Remove ${pk.player} from this roster">Delete</button>`;
+    <button class="del-pick-btn" title="Remove ${pk.player} from this roster">D</button>`;
   row.querySelector('.del-pick-btn').addEventListener('click', () => {
     const idx = picks.indexOf(pk);
     if (idx !== -1) picks.splice(idx, 1);
-    savePicks();
+    syncPicks();
     render();
   });
   return row;
 }
 
+// Flags any player whose position + bye week matches another player at the
+// same position on the same team — e.g. two rostered WRs both on a Bye 11.
+function findByeConflicts(teamCode) {
+  const counts = {};
+  picks.filter(pk => pk.draftTeam === teamCode && pk.pos && pk.bye != null)
+    .forEach(pk => {
+      const key = pk.pos + '|' + pk.bye;
+      counts[key] = (counts[key] || 0) + 1;
+    });
+  return counts;
+}
+
+// QB, RB, WR, TE (not explicitly listed — placed after WR by convention), D, K, ?, C, then anything else.
+const POS_SORT_ORDER = { 'QB': 1, 'RB': 2, 'WR': 3, 'TE': 4, 'D': 5, 'K': 6, '?': 7, 'C': 8 };
+function posSortRank(pos) {
+  return POS_SORT_ORDER[pos] !== undefined ? POS_SORT_ORDER[pos] : 99;
+}
+
 function fillPickList(container, teamCode) {
   container.innerHTML = '';
-  const visible = picks.filter(pk => pk.draftTeam === teamCode).slice().reverse();
+  const visible = picks.filter(pk => pk.draftTeam === teamCode).slice().sort((a, b) => {
+    const rankDiff = posSortRank(a.pos) - posSortRank(b.pos);
+    if (rankDiff !== 0) return rankDiff;
+    return a.player.localeCompare(b.player);
+  });
   if (visible.length === 0) {
     container.innerHTML = `<div class="empty-note">No ${teamCode} picks logged yet.</div>`;
   } else {
-    visible.forEach(pk => container.appendChild(buildPickRow(pk)));
+    const conflictCounts = findByeConflicts(teamCode);
+    visible.forEach(pk => {
+      const key = pk.pos + '|' + pk.bye;
+      const hasByeConflict = pk.pos && pk.bye != null && conflictCounts[key] >= 2;
+      container.appendChild(buildPickRow(pk, hasByeConflict));
+    });
   }
 }
 
 function render() {
   undoBtn.disabled = picks.length === 0;
+  buildTicker();
 
   // Cap grid
   const capGrid = document.getElementById('capGrid');
   capGrid.innerHTML = '';
+  const MAX_ROSTER_SLOTS = 16;
   TEAMS.forEach(code => {
     const { left, slots } = teamStats(code);
     const pct = Math.max(0, left / TOTAL_BUDGET);
     const color = gaugeColor(pct);
     const deg = Math.round(pct * 360);
+    const slotsPct = Math.max(0, 1 - (slots / MAX_ROSTER_SLOTS));
+    const slotsColor = gaugeColor(slotsPct);
     const card = document.createElement('div');
     card.className = 'cap-card';
     card.innerHTML = `
-      <div class="code">${code}</div>
-      <div class="slots">${slots} roster slot${slots === 1 ? '' : 's'} filled</div>
+      <div class="card-top-row">
+        <div class="code">${code}</div>
+        <div class="slots" title="Roster slots filled" style="color:${slotsColor}"><svg viewBox="0 0 24 24" fill="currentColor" width="27" height="27"><path d="M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg>${slots}</div>
+      </div>
       <div class="gauge-row">
         <div class="gauge" style="background:conic-gradient(${color} ${deg}deg, #223054 0deg)">
           <div class="gauge-inner" style="color:${color}">${Math.round(pct*100)}%</div>
         </div>
         <div class="cap-figures">
+          <div class="cap-label">Cap Remaining</div>
           <div class="left" style="color:${color}">$${left}</div>
-          <div class="of">of $${TOTAL_BUDGET} left</div>
         </div>
       </div>`;
     card.addEventListener('click', () => openTeamRosterModal(code));
@@ -828,6 +1338,7 @@ function render() {
 
   // Keep an open team-roster modal in sync if a pick changes while it's open
   if (teamRosterOverlay.classList.contains('open') && currentRosterTeam) {
+    updateRosterModalCap(currentRosterTeam);
     fillPickList(rosterModalList, currentRosterTeam);
   }
 }
@@ -877,7 +1388,7 @@ logBtn.addEventListener('click', () => {
   amtInput.value = '';
   draftTeamSelect.value = '';
 
-  savePicks();
+  syncPicks();
   render();
 });
 
@@ -888,12 +1399,12 @@ undoBtn.addEventListener('click', () => {
     ? `Undid the $${removed.amt} cap penalty on ${removed.draftTeam}.`
     : `Undid ${removed.player} from ${removed.draftTeam} ($${removed.amt}).`;
   formMsg.className = 'msg ok';
-  savePicks();
+  syncPicks();
   render();
 });
 
 // ---------- Reset ----------
-const RESET_PIN = '1019'; // change this to whatever PIN you want to gate resets with
+// (Reset uses APP_PIN, defined at the top of this script)
 
 const resetOverlay = document.getElementById('resetOverlay');
 const pinInput = document.getElementById('pinInput');
@@ -920,14 +1431,14 @@ pinCancelBtn.addEventListener('click', closeResetModal);
 resetOverlay.addEventListener('click', (e) => { if (e.target === resetOverlay) closeResetModal(); });
 
 pinSubmitBtn.addEventListener('click', () => {
-  if (pinInput.value.trim() !== RESET_PIN) {
+  if (pinInput.value.trim() !== APP_PIN) {
     resetError.textContent = 'Incorrect PIN. Try again.';
     pinInput.value = '';
     pinInput.focus();
     return;
   }
   picks = [];
-  savePicks();
+  syncPicks();
   render();
   closeResetModal();
 });
@@ -940,6 +1451,7 @@ pinInput.addEventListener('keydown', (e) => {
 // ---------- Team roster modal (click a Cap Tracker card) ----------
 const teamRosterOverlay = document.getElementById('teamRosterOverlay');
 const rosterModalTitle = document.getElementById('rosterModalTitle');
+const rosterModalCap = document.getElementById('rosterModalCap');
 const rosterModalList = document.getElementById('rosterModalList');
 const rosterCloseBtn = document.getElementById('rosterCloseBtn');
 let currentRosterTeam = null;
@@ -947,8 +1459,16 @@ let currentRosterTeam = null;
 function openTeamRosterModal(code) {
   currentRosterTeam = code;
   rosterModalTitle.textContent = code + "'s Picks";
+  updateRosterModalCap(code);
   fillPickList(rosterModalList, code);
   teamRosterOverlay.classList.add('open');
+}
+
+function updateRosterModalCap(code) {
+  const { left } = teamStats(code);
+  const pct = left / TOTAL_BUDGET;
+  rosterModalCap.textContent = `$${left} left`;
+  rosterModalCap.style.color = gaugeColor(pct);
 }
 
 function closeTeamRosterModal() {
@@ -960,6 +1480,56 @@ rosterCloseBtn.addEventListener('click', closeTeamRosterModal);
 teamRosterOverlay.addEventListener('click', (e) => { if (e.target === teamRosterOverlay) closeTeamRosterModal(); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeTeamRosterModal(); });
 
+const POS_RANKED = {"QB": [{"name": "Josh Allen", "rank": 1}, {"name": "Lamar Jackson", "rank": 2}, {"name": "Jalen Hurts", "rank": 3}, {"name": "Drake Maye", "rank": 4}, {"name": "Jayden Daniels", "rank": 5}, {"name": "Joe Burrow", "rank": 6}, {"name": "Jaxson Dart", "rank": 7}, {"name": "Bo Nix", "rank": 8}, {"name": "Matthew Stafford", "rank": 9}, {"name": "Brock Purdy", "rank": 10}, {"name": "Patrick Mahomes", "rank": 11}, {"name": "Trevor Lawrence", "rank": 12}, {"name": "Dak Prescott", "rank": 13}, {"name": "Justin Herbert", "rank": 14}, {"name": "Caleb Williams", "rank": 15}, {"name": "Jared Goff", "rank": 16}, {"name": "Daniel Jones", "rank": 17}, {"name": "Tyler Shough", "rank": 18}, {"name": "Baker Mayfield", "rank": 19}, {"name": "Jordan Love", "rank": 20}, {"name": "Kyler Murray", "rank": 21}, {"name": "C.J. Stroud", "rank": 22}, {"name": "Sam Darnold", "rank": 23}, {"name": "Bryce Young", "rank": 24}, {"name": "Malik Willis", "rank": 25}, {"name": "Geno Smith", "rank": 26}, {"name": "Cameron Ward", "rank": 27}, {"name": "Aaron Rodgers", "rank": 28}, {"name": "Jacoby Brissett", "rank": 29}, {"name": "Fernando Mendoza", "rank": 30}, {"name": "Deshaun Watson", "rank": 31}, {"name": "Tua Tagovailoa", "rank": 32}, {"name": "Michael Penix Jr.", "rank": 33}, {"name": "Shedeur Sanders", "rank": 34}, {"name": "Kirk Cousins", "rank": 35}, {"name": "J.J. McCarthy", "rank": 36}, {"name": "Carson Beck", "rank": 37}, {"name": "Justin Fields", "rank": 38}, {"name": "Joe Flacco", "rank": 39}, {"name": "Jarrett Stidham", "rank": 40}, {"name": "Nick Mullens", "rank": 41}, {"name": "Jake Browning", "rank": 42}, {"name": "Tommy DeVito", "rank": 43}, {"name": "Marcus Mariota", "rank": 44}, {"name": "Tyson Bagent", "rank": 45}, {"name": "Ty Simpson", "rank": 46}, {"name": "Sam Howell", "rank": 47}, {"name": "Tanner McKee", "rank": 48}, {"name": "Drew Allar", "rank": 49}, {"name": "Teddy Bridgewater", "rank": 50}, {"name": "Trey Lance", "rank": 51}, {"name": "Riley Leonard", "rank": 52}, {"name": "Tyrod Taylor", "rank": 53}, {"name": "Kenny Pickett", "rank": 54}, {"name": "Spencer Rattler", "rank": 55}, {"name": "Jameis Winston", "rank": 56}, {"name": "Tyler Huntley", "rank": 57}, {"name": "Mac Jones", "rank": 58}, {"name": "Davis Mills", "rank": 59}, {"name": "Cade Klubnik", "rank": 60}, {"name": "Kyle Allen", "rank": 61}, {"name": "Drew Lock", "rank": 62}, {"name": "Mitchell Trubisky", "rank": 63}, {"name": "Quinn Ewers", "rank": 64}, {"name": "Gardner Minshew", "rank": 65}], "RB": [{"name": "Jahmyr Gibbs", "rank": 1}, {"name": "Bijan Robinson", "rank": 2}, {"name": "Christian McCaffrey", "rank": 3}, {"name": "Jonathan Taylor", "rank": 4}, {"name": "De'Von Achane", "rank": 5}, {"name": "Ashton Jeanty", "rank": 6}, {"name": "Omarion Hampton", "rank": 7}, {"name": "James Cook", "rank": 8}, {"name": "Jeremiyah Love", "rank": 9}, {"name": "Derrick Henry", "rank": 10}, {"name": "Saquon Barkley", "rank": 11}, {"name": "Josh Jacobs", "rank": 12}, {"name": "Breece Hall", "rank": 13}, {"name": "Ken Walker III", "rank": 14}, {"name": "Chase Brown", "rank": 15}, {"name": "Javonte Williams", "rank": 16}, {"name": "Cam Skattebo", "rank": 17}, {"name": "Travis Etienne", "rank": 18}, {"name": "Kyren Williams", "rank": 19}, {"name": "Quinshon Judkins", "rank": 20}, {"name": "D'Andre Swift", "rank": 21}, {"name": "TreVeyon Henderson", "rank": 22}, {"name": "Bucky Irving", "rank": 23}, {"name": "Bhayshul Tuten", "rank": 24}, {"name": "Jadarian Price", "rank": 25}, {"name": "David Montgomery", "rank": 26}, {"name": "Jaylen Warren", "rank": 27}, {"name": "Rhamondre Stevenson", "rank": 28}, {"name": "Tony Pollard", "rank": 29}, {"name": "Aaron Jones", "rank": 30}, {"name": "Rico Dowdle", "rank": 31}, {"name": "Chuba Hubbard", "rank": 32}, {"name": "Kenneth Gainwell", "rank": 33}, {"name": "Kyle Monangai", "rank": 34}, {"name": "Rachaad White", "rank": 35}, {"name": "J.K. Dobbins", "rank": 36}, {"name": "RJ Harvey", "rank": 37}, {"name": "Jonathon Brooks", "rank": 38}, {"name": "Blake Corum", "rank": 39}, {"name": "Jacory Croskey-Merritt", "rank": 40}, {"name": "Tyjae Spears", "rank": 41}, {"name": "Zach Charbonnet", "rank": 42}, {"name": "Jordan Mason", "rank": 43}, {"name": "Woody Marks", "rank": 44}, {"name": "Alvin Kamara", "rank": 45}, {"name": "Isiah Pacheco", "rank": 46}, {"name": "Justice Hill", "rank": 47}, {"name": "Samaje Perine", "rank": 48}, {"name": "Brian Robinson Jr.", "rank": 49}, {"name": "Tyler Allgeier", "rank": 50}, {"name": "Tyrone Tracy Jr.", "rank": 51}, {"name": "Dylan Sampson", "rank": 52}, {"name": "Ty Johnson", "rank": 53}, {"name": "Braelon Allen", "rank": 54}, {"name": "Chris Rodriguez", "rank": 55}, {"name": "Mike Washington Jr.", "rank": 56}, {"name": "MarShawn Lloyd", "rank": 57}, {"name": "Tank Bigsby", "rank": 58}, {"name": "Keaton Mitchell", "rank": 59}, {"name": "Emari Demercado", "rank": 60}, {"name": "Jordan James", "rank": 61}, {"name": "Isaiah Davis", "rank": 62}, {"name": "Jaydon Blue", "rank": 63}, {"name": "LeQuint Allen", "rank": 64}, {"name": "Emmett Johnson", "rank": 65}, {"name": "Kyle Juszczyk", "rank": 66}, {"name": "Chris Brooks", "rank": 67}, {"name": "Jaylen Wright", "rank": 68}, {"name": "George Holani", "rank": 69}, {"name": "Jonah Coleman", "rank": 70}, {"name": "Kimani Vidal", "rank": 71}, {"name": "Ray Davis", "rank": 72}, {"name": "Sean Tucker", "rank": 73}, {"name": "DJ Giddens", "rank": 74}, {"name": "Malik Davis", "rank": 75}, {"name": "Ollie Gordon II", "rank": 76}, {"name": "Kaelon Black", "rank": 77}, {"name": "Will Shipley", "rank": 78}, {"name": "Adam Randall", "rank": 79}, {"name": "Hunter Luepke", "rank": 80}, {"name": "Demond Claiborne", "rank": 81}, {"name": "Devin Singletary", "rank": 82}, {"name": "Nicholas Singleton", "rank": 83}, {"name": "Tyler Badie", "rank": 84}, {"name": "Tahj Brooks", "rank": 85}, {"name": "Trevor Etienne", "rank": 86}, {"name": "Alec Ingold", "rank": 87}, {"name": "Kaytron Allen", "rank": 88}, {"name": "Seth McGowan", "rank": 89}, {"name": "Adam Prentice", "rank": 90}, {"name": "Connor Heyward", "rank": 91}, {"name": "Michael Burton", "rank": 92}, {"name": "Emanuel Wilson", "rank": 93}, {"name": "Max Bredeson", "rank": 94}, {"name": "Andrew Beck", "rank": 95}, {"name": "Riley Nowakowski", "rank": 96}, {"name": "Reggie Gilliam", "rank": 97}, {"name": "Patrick Ricard", "rank": 98}, {"name": "Kendre Miller", "rank": 99}, {"name": "Jawhar Jordan", "rank": 100}, {"name": "Kaleb Johnson", "rank": 101}, {"name": "British Brooks", "rank": 102}, {"name": "Kene Nwangwu", "rank": 103}, {"name": "Isaac Guerendo", "rank": 104}, {"name": "Brashard Smith", "rank": 105}, {"name": "Bam Knight", "rank": 106}, {"name": "Dylan Laube", "rank": 107}, {"name": "Rasheen Ali", "rank": 108}, {"name": "Jacob Saylors", "rank": 109}, {"name": "DeeJay Dallas", "rank": 110}, {"name": "Josh Williams", "rank": 111}], "WR": [{"name": "Puka Nacua", "rank": 1}, {"name": "Ja'Marr Chase", "rank": 2}, {"name": "Jaxon Smith-Njigba", "rank": 3}, {"name": "Amon-Ra St. Brown", "rank": 4}, {"name": "CeeDee Lamb", "rank": 5}, {"name": "Justin Jefferson", "rank": 6}, {"name": "Rashee Rice", "rank": 7}, {"name": "Drake London", "rank": 8}, {"name": "Nico Collins", "rank": 9}, {"name": "A.J. Brown", "rank": 10}, {"name": "Garrett Wilson", "rank": 11}, {"name": "Chris Olave", "rank": 12}, {"name": "Tetairoa McMillan", "rank": 13}, {"name": "George Pickens", "rank": 14}, {"name": "Zay Flowers", "rank": 15}, {"name": "DeVonta Smith", "rank": 16}, {"name": "Davante Adams", "rank": 17}, {"name": "Malik Nabers", "rank": 18}, {"name": "Emeka Egbuka", "rank": 19}, {"name": "Ladd McConkey", "rank": 20}, {"name": "Tee Higgins", "rank": 21}, {"name": "Terry McLaurin", "rank": 22}, {"name": "Jaylen Waddle", "rank": 23}, {"name": "Rome Odunze", "rank": 24}, {"name": "Carnell Tate", "rank": 25}, {"name": "DJ Moore", "rank": 26}, {"name": "Jameson Williams", "rank": 27}, {"name": "Luther Burden III", "rank": 28}, {"name": "Courtland Sutton", "rank": 29}, {"name": "Alec Pierce", "rank": 30}, {"name": "Michael Pittman Jr.", "rank": 31}, {"name": "DK Metcalf", "rank": 32}, {"name": "Marvin Harrison Jr.", "rank": 33}, {"name": "Jordyn Tyson", "rank": 34}, {"name": "Parker Washington", "rank": 35}, {"name": "Christian Watson", "rank": 36}, {"name": "Matthew Golden", "rank": 37}, {"name": "Mike Evans", "rank": 38}, {"name": "Jakobi Meyers", "rank": 39}, {"name": "Michael Wilson", "rank": 40}, {"name": "Brian Thomas Jr.", "rank": 41}, {"name": "Wan'Dale Robinson", "rank": 42}, {"name": "Josh Downs", "rank": 43}, {"name": "Makai Lemon", "rank": 44}, {"name": "Xavier Worthy", "rank": 45}, {"name": "Deebo Samuel", "rank": 46}, {"name": "Khalil Shakir", "rank": 47}, {"name": "Jayden Reed", "rank": 48}, {"name": "Jordan Addison", "rank": 49}, {"name": "Quentin Johnston", "rank": 50}, {"name": "KC Concepcion", "rank": 51}, {"name": "Romeo Doubs", "rank": 52}, {"name": "Chris Godwin", "rank": 53}, {"name": "Jalen Coker", "rank": 54}, {"name": "Rashid Shaheed", "rank": 55}, {"name": "Calvin Ridley", "rank": 56}, {"name": "Jayden Higgins", "rank": 57}, {"name": "Jerry Jeudy", "rank": 58}, {"name": "Tre Tucker", "rank": 59}, {"name": "Jalen McMillan", "rank": 60}, {"name": "Denzel Boston", "rank": 61}, {"name": "Germie Bernard", "rank": 62}, {"name": "Adonai Mitchell", "rank": 63}, {"name": "Jalen Nailor", "rank": 64}, {"name": "Rashod Bateman", "rank": 65}, {"name": "Antonio Williams", "rank": 66}, {"name": "Jauan Jennings", "rank": 67}, {"name": "Xavier Legette", "rank": 68}, {"name": "Travis Hunter", "rank": 69}, {"name": "De'Zhaun Stribling", "rank": 70}, {"name": "Malik Washington", "rank": 71}, {"name": "Tank Dell", "rank": 72}, {"name": "Omar Cooper Jr.", "rank": 73}, {"name": "Cooper Kupp", "rank": 74}, {"name": "Darnell Mooney", "rank": 76}, {"name": "Jalen Tolbert", "rank": 77}, {"name": "Tre Harris", "rank": 78}, {"name": "Ryan Flournoy", "rank": 79}, {"name": "Chris Bell", "rank": 80}, {"name": "Dyami Brown", "rank": 81}, {"name": "Darius Slayton", "rank": 82}, {"name": "Jack Bech", "rank": 83}, {"name": "Ja'Kobi Lane", "rank": 84}, {"name": "Treylon Burks", "rank": 85}, {"name": "Caleb Douglas", "rank": 86}, {"name": "Kayshon Boutte", "rank": 87}, {"name": "Tyquan Thornton", "rank": 88}, {"name": "Andrei Iosivas", "rank": 89}, {"name": "Jaylin Noel", "rank": 90}, {"name": "Jahan Dotson", "rank": 91}, {"name": "Isaac TeSlaa", "rank": 92}, {"name": "Pat Bryant", "rank": 93}, {"name": "Savion Williams", "rank": 94}, {"name": "Marvin Mims", "rank": 95}, {"name": "Kavontae Turpin", "rank": 96}, {"name": "Dontayvion Wicks", "rank": 97}, {"name": "Tory Horton", "rank": 98}, {"name": "Ted Hurst", "rank": 99}, {"name": "Jaylin Lane", "rank": 100}, {"name": "DeMario Douglas", "rank": 101}, {"name": "Devaughn Vele", "rank": 102}, {"name": "Nick Westbrook-Ikhine", "rank": 103}, {"name": "Keon Coleman", "rank": 104}, {"name": "Elijah Sarratt", "rank": 105}, {"name": "Ashton Dulin", "rank": 106}, {"name": "Tutu Atwell", "rank": 107}, {"name": "Kevin Coleman Jr.", "rank": 108}, {"name": "Marquise Brown", "rank": 109}, {"name": "Troy Franklin", "rank": 110}, {"name": "Kendrick Bourne", "rank": 111}, {"name": "Kalif Raymond", "rank": 112}, {"name": "Christian Kirk", "rank": 113}, {"name": "Luke McCaffrey", "rank": 114}, {"name": "Josh Palmer", "rank": 115}, {"name": "Cyrus Allen", "rank": 116}, {"name": "Skyler Bell", "rank": 117}, {"name": "Bryce Lance", "rank": 118}, {"name": "Jordan Whittington", "rank": 119}, {"name": "Zavion Thomas", "rank": 120}, {"name": "Odell Beckham Jr.", "rank": 121}, {"name": "Devontez Walker", "rank": 122}, {"name": "Malachi Fields", "rank": 123}, {"name": "Xavier Hutchinson", "rank": 124}, {"name": "Dont'e Thornton Jr.", "rank": 125}, {"name": "Olamide Zaccheaus", "rank": 126}, {"name": "Chimere Dike", "rank": 127}, {"name": "Isaiah Bond", "rank": 128}, {"name": "Konata Mumpfield", "rank": 129}, {"name": "Mack Hollins", "rank": 130}, {"name": "Brenen Thompson", "rank": 131}, {"name": "KeAndre Lambert-Smith", "rank": 132}, {"name": "Kyle T. Williams", "rank": 133}, {"name": "Tez Johnson", "rank": 134}, {"name": "Jimmy Horn Jr.", "rank": 135}, {"name": "Mitchell Tinsley", "rank": 136}, {"name": "Calvin Austin III", "rank": 137}, {"name": "Jalen Royals", "rank": 138}, {"name": "Anthony Gould", "rank": 139}, {"name": "Greg Dortch", "rank": 140}, {"name": "Elic Ayomanor", "rank": 141}, {"name": "Malik Benson", "rank": 142}, {"name": "Isaiah Williams", "rank": 143}, {"name": "Bo Melton", "rank": 144}, {"name": "Ben Skowronek", "rank": 145}, {"name": "Derius Davis", "rank": 146}, {"name": "Xavier Smith", "rank": 147}, {"name": "Tyrell Shavers", "rank": 148}, {"name": "Colbie Young", "rank": 149}, {"name": "Barion Brown", "rank": 150}, {"name": "CJ Daniels", "rank": 151}, {"name": "Malachi Corley", "rank": 152}, {"name": "Demarcus Robinson", "rank": 153}, {"name": "Tai Felton", "rank": 154}, {"name": "Jahdae Walker", "rank": 155}, {"name": "Justin Watson", "rank": 156}, {"name": "Darius Cooper", "rank": 157}, {"name": "Jonathan Mingo", "rank": 158}, {"name": "Laquon Treadwell", "rank": 159}, {"name": "Brycen Tremayne", "rank": 160}, {"name": "Reggie Virgil", "rank": 161}, {"name": "Kaden Wetjen", "rank": 162}, {"name": "Cedric Tillman", "rank": 163}, {"name": "Kameron Johnson", "rank": 164}, {"name": "Arian Smith", "rank": 165}, {"name": "Braxton Berrios", "rank": 166}, {"name": "Charlie Jones", "rank": 167}, {"name": "Myles Price", "rank": 168}, {"name": "LaJohntay Wester", "rank": 169}, {"name": "Britain Covey", "rank": 170}, {"name": "JuJu Smith-Schuster", "rank": 171}, {"name": "Nikko Remigio", "rank": 172}, {"name": "Jacob Cowing", "rank": 173}, {"name": "Ke'Shawn Williams", "rank": 174}, {"name": "Devin Duvernay", "rank": 175}, {"name": "Gage Larvadain", "rank": 176}, {"name": "Mason Tipton", "rank": 177}, {"name": "Efton Chism III", "rank": 178}, {"name": "Skyy Moore", "rank": 179}, {"name": "Dareke Young", "rank": 180}, {"name": "Josh Cameron", "rank": 181}, {"name": "Jalen Brooks", "rank": 182}, {"name": "Michael Bandy", "rank": 183}, {"name": "Jeshaun Jones", "rank": 184}, {"name": "Mason Kinsey", "rank": 185}], "TE": [{"name": "Trey McBride", "rank": 1}, {"name": "Brock Bowers", "rank": 2}, {"name": "Tyler Warren", "rank": 3}, {"name": "Colston Loveland", "rank": 4}, {"name": "Sam LaPorta", "rank": 5}, {"name": "Harold Fannin Jr.", "rank": 6}, {"name": "Kyle Pitts", "rank": 7}, {"name": "George Kittle", "rank": 8}, {"name": "Travis Kelce", "rank": 9}, {"name": "Dallas Goedert", "rank": 10}, {"name": "Tucker Kraft", "rank": 11}, {"name": "Mark Andrews", "rank": 12}, {"name": "Jake Ferguson", "rank": 13}, {"name": "Kenyon Sadiq", "rank": 14}, {"name": "T.J. Hockenson", "rank": 15}, {"name": "Isaiah Likely", "rank": 16}, {"name": "Dalton Kincaid", "rank": 17}, {"name": "Hunter Henry", "rank": 18}, {"name": "Juwan Johnson", "rank": 19}, {"name": "Brenton Strange", "rank": 20}, {"name": "Pat Freiermuth", "rank": 21}, {"name": "Terrance Ferguson", "rank": 22}, {"name": "Dalton Schultz", "rank": 23}, {"name": "Gunnar Helm", "rank": 24}, {"name": "Chigoziem Okonkwo", "rank": 25}, {"name": "Greg Dulcich", "rank": 26}, {"name": "A.J. Barner", "rank": 27}, {"name": "Mike Gesicki", "rank": 28}, {"name": "Evan Engram", "rank": 29}, {"name": "Oronde Gadsden II", "rank": 30}, {"name": "Cade Otton", "rank": 31}, {"name": "Michael Mayer", "rank": 32}, {"name": "Ja'Tavion Sanders", "rank": 33}, {"name": "David Njoku", "rank": 34}, {"name": "Darnell Washington", "rank": 35}, {"name": "Dawson Knox", "rank": 36}, {"name": "Colby Parkinson", "rank": 37}, {"name": "Theo Johnson", "rank": 38}, {"name": "Tommy Tremble", "rank": 39}, {"name": "Noah Gray", "rank": 40}, {"name": "Elijah Arroyo", "rank": 41}, {"name": "Mason Taylor", "rank": 42}, {"name": "Cole Kmet", "rank": 43}, {"name": "Noah Fant", "rank": 44}, {"name": "Austin Hooper", "rank": 45}, {"name": "Elijah Higgins", "rank": 46}, {"name": "Erick All", "rank": 47}, {"name": "Will Kacmarek", "rank": 48}, {"name": "Drew Sample", "rank": 49}, {"name": "Josh Oliver", "rank": 50}, {"name": "Tyler Higbee", "rank": 51}, {"name": "Eli Stowers", "rank": 52}, {"name": "Eli Raridon", "rank": 53}, {"name": "Charlie Kolar", "rank": 54}, {"name": "Mitchell Evans", "rank": 55}, {"name": "Cade Stover", "rank": 56}, {"name": "John Bates", "rank": 57}, {"name": "Jake Tonges", "rank": 58}, {"name": "Tanner Hudson", "rank": 59}, {"name": "Adam Trautman", "rank": 60}, {"name": "Luke Schoonmaker", "rank": 61}, {"name": "Jackson Hawes", "rank": 62}, {"name": "Mo Alie-Cox", "rank": 63}, {"name": "Daniel Bellinger", "rank": 64}, {"name": "Ben Sinnott", "rank": 65}, {"name": "Jeremy Ruckert", "rank": 66}, {"name": "Luke Musgrave", "rank": 67}, {"name": "Durham Smythe", "rank": 68}, {"name": "Davis Allen", "rank": 69}, {"name": "Foster Moreau", "rank": 70}, {"name": "Nate Adkins", "rank": 71}, {"name": "Brock Wright", "rank": 72}, {"name": "Nate Boerkircher", "rank": 73}, {"name": "Payne Durham", "rank": 74}, {"name": "Joe Royer", "rank": 75}, {"name": "Ben Sims", "rank": 76}, {"name": "Luke Farrell", "rank": 77}, {"name": "Max Klare", "rank": 78}, {"name": "Justin Joly", "rank": 79}, {"name": "Brevyn Spann-Ford", "rank": 80}, {"name": "CJ Dippre", "rank": 81}, {"name": "Tanner Koziol", "rank": 82}, {"name": "Ko Kieft", "rank": 83}, {"name": "Oscar Delp", "rank": 84}, {"name": "Tyler Conklin", "rank": 85}, {"name": "Marlin Klein", "rank": 86}, {"name": "Andrew Ogletree", "rank": 87}, {"name": "Sam Roush", "rank": 88}, {"name": "Matthew Hibner", "rank": 89}, {"name": "Josh Cuevas", "rank": 90}, {"name": "Eric Saubert", "rank": 91}, {"name": "Tip Reiman", "rank": 92}, {"name": "Ian Thomas", "rank": 93}, {"name": "Charlie Woerner", "rank": 94}, {"name": "Johnny Mundt", "rank": 95}, {"name": "Jack Stoll", "rank": 96}, {"name": "Chris Manhertz", "rank": 97}]};
+const TOP_N_BY_POS = { QB: 3, RB: 3, WR: 3, TE: 3 };
+
+// ---------- Team power ranking ----------
+// Average positional rank (QB/RB/WR/TE only) across each team's drafted
+// players — lower average = stronger roster. K/D/other positions excluded
+// from both the sum and the player count, per the ranking rule.
+const RANK_POS = ['QB', 'RB', 'WR', 'TE'];
+const RANK_LOOKUP = {};
+RANK_POS.forEach(pos => {
+  POS_RANKED[pos].forEach(p => { RANK_LOOKUP[pos + '|' + p.name] = p.rank; });
+});
+
+const posBannerToggle = document.getElementById('posBannerToggle');
+
+function buildTicker() {
+  const track = document.getElementById('tickerTrack');
+  const perPos = posBannerToggle.checked ? TOP_N_BY_POS : { QB: 1, RB: 1, WR: 1, TE: 1 };
+
+  // Best-available top N per position, QB then RB then WR then TE — recomputed
+  // live off whichever players are still undrafted, so a drafted leader is
+  // immediately replaced by the next-best available player at that position.
+  let chunks = [];
+  ['QB', 'RB', 'WR', 'TE'].forEach(pos => {
+    const n = perPos[pos];
+    const available = POS_RANKED[pos].filter(p => !isDrafted(p.name)).slice(0, n);
+    available.forEach((p, idx) => {
+      chunks.push(`<span class="ticker-item"><span class="tpos">${pos}${idx + 1}</span><span class="tname">${p.name}</span><span class="trank">(${p.rank})</span></span>`);
+    });
+  });
+  if (chunks.length === 0) {
+    chunks = ['<span class="ticker-item"><span class="tname">Every top QB/RB/WR/TE has been drafted.</span></span>'];
+  }
+
+  const itemsHtml = chunks.join('<span class="ticker-item" aria-hidden="true">&#8226;</span>');
+  // duplicated once back-to-back so the marquee loop (0 to -50%) is seamless
+  track.innerHTML = itemsHtml + itemsHtml;
+}
+
+posBannerToggle.addEventListener('change', buildTicker);
+
+// ---------- Expand/collapse the BY picks list ----------
+const logList = document.getElementById('logList');
+const expandByListBtn = document.getElementById('expandByListBtn');
+expandByListBtn.addEventListener('click', () => {
+  const isExpanded = logList.classList.toggle('expanded');
+  expandByListBtn.innerHTML = isExpanded ? 'Show Less &#9652;' : 'Show All &#9662;';
+});
+
+buildTicker();
 render();
 </script>
 </body>
